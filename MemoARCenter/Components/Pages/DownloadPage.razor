@@ -1,0 +1,30 @@
+﻿@page "/download-page/{base64Parameter}"
+
+@code {
+    [Parameter]
+    public string Base64Parameter { get; set; }
+
+    private string DecodedParameter => System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Base64Parameter));
+    private string MemoarUrl => $"memoar://getr?parameter={Uri.EscapeDataString(DecodedParameter)}";
+    private string DefaultUrl => DecodedParameter;
+}
+
+<div class="home-container">
+    <h1 class="welcome-title">Welcome to <span class="app-name">MemoAR</span></h1>
+
+    <p class="app-description">
+        If the download doesn't start automatically, click the button below to manually download the database.
+    </p>
+
+    <div class="button-area">
+        <a href="@MemoarUrl" class="upload-button">Download DB</a>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        const parameter = "@DefaultUrl";
+        const memoarUrl = `memoar://getr?parameter=${encodeURIComponent(parameter)}`;
+        window.location.href = memoarUrl;
+    };
+</script>

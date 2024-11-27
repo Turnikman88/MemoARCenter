@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter", "MemoARCenter\MemoARCenter.csproj", "{916F67D8-9644-4244-BA8A-4E8C23AD3F99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter.Client", "MemoARCenter.Client\MemoARCenter.Client.csproj", "{2385EFC2-59FB-417F-A079-6526A1C1A24F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter.Services", "..\MemoARCenter.Services\MemoARCenter.Services.csproj", "{FB00FB0A-259E-4B61-BE72-6DE152143B6C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{916F67D8-9644-4244-BA8A-4E8C23AD3F99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{916F67D8-9644-4244-BA8A-4E8C23AD3F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{916F67D8-9644-4244-BA8A-4E8C23AD3F99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{916F67D8-9644-4244-BA8A-4E8C23AD3F99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2385EFC2-59FB-417F-A079-6526A1C1A24F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2385EFC2-59FB-417F-A079-6526A1C1A24F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2385EFC2-59FB-417F-A079-6526A1C1A24F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2385EFC2-59FB-417F-A079-6526A1C1A24F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB00FB0A-259E-4B61-BE72-6DE152143B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB00FB0A-259E-4B61-BE72-6DE152143B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB00FB0A-259E-4B61-BE72-6DE152143B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB00FB0A-259E-4B61-BE72-6DE152143B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

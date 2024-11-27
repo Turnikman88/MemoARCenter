@@ -1,0 +1,114 @@
+﻿@page "/file-upload"
+@rendermode InteractiveServer
+
+<div class="file-upload-container">
+    <h3 class="header">Upload Archive</h3>
+
+    <div class="file-input-area">
+        <InputFile enctype="multipart/form-data" id="file-input" OnChange="HandleFileSelected" Multiple="true" class="file-input" />
+        <label for="file-input" class="file-upload-button">
+            Select File
+        </label>
+    </div>
+
+    @if (uploadedFiles.Count > 0)
+    {
+        <div class="preview-area">
+            <h4>Uploaded Files:</h4>
+            @foreach (var file in uploadedFiles)
+            {
+                <div class="preview-item">
+                    @if (file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png"))
+                    {
+                        <img src="uploads/@file.Name" alt="@file.Name" class="preview-image" />
+                    }
+                    else if (file.Name.EndsWith(".mp4"))
+                    {
+                        <video src="uploads/@file.Name" controls class="preview-video"></video>
+                    }
+                    else
+                    {
+                        <div class="file-placeholder">
+                            <p>@file.Name</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="empty-preview">No files selected yet.</p>
+    }
+
+    <button @onclick="UploadFiles" class="upload-button">Upload</button>
+
+    @if (!string.IsNullOrEmpty(uploadStatus))
+    {
+        <p class="upload-status">@uploadStatus</p>
+    }
+</div>
+
+@code {
+    private List<IBrowserFile> uploadedFiles = new();
+    private string? uploadStatus;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        uploadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            if (file == null || file.Size == 0)
+                continue;
+
+
+            uploadedFiles.Add(file);
+        }
+    }
+
+    private async Task UploadFiles()
+    {
+        if (uploadedFiles.Count == 0)
+        {
+            uploadStatus = "No files selected.";
+            return;
+        }
+
+        try
+        {
+            using var httpClient = new HttpClient();
+            using var content = new MultipartFormDataContent();
+
+            foreach (var file in uploadedFiles)
+            {
+                var fileStream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // Max file size: 10MB
+                var streamContent = new StreamContent(fileStream);
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType); // Preserve ContentType
+                content.Add(streamContent, "files", file.Name); // Add file to the form
+            }
+
+            var response = await httpClient.PostAsync("https://0.0.0.0:7264/api/fileupload/upload", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                uploadStatus = "Files uploaded successfully!";
+            }
+            else
+            {
+                uploadStatus = $"File upload failed. Status Code: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            uploadStatus = $"Error: {ex.Message}";
+        }
+    }
+
+    private class UploadedFile
+    {
+        public string Name { get; set; }
+        public long Size { get; set; } // Size in KB
+        public byte[] Content { get; set; } // File content
+    }
+}

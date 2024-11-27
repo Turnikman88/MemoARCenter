@@ -1,0 +1,115 @@
+﻿@page "/upload-zip"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="file-upload-container">
+    <h3 class="header">Upload Archive</h3>
+
+    <div class="file-input-area">
+        <label for="file-upload" class="file-upload-button">Select File</label>
+        <InputFile id="file-upload" class="file-input" OnChange="HandleFileChange" />
+    </div>
+
+    <div class="button-area">
+        <button @onclick="UploadFile" class="upload-button" disabled="@(!isFileSelected)">Upload</button>
+    </div>
+
+    <p class="upload-status">@statusMessage</p>
+
+    @if (!string.IsNullOrEmpty(qrCodeImageData))
+    {
+        <div class="qr-code-area">
+            <h4 class="preview-header">Your QR Code:</h4>
+            <a href="@qrCodeURL" target="_blank">
+                <img src="@qrCodeImageData" alt="QR Code" class="qr-code" />
+            </a>
+        </div>
+    }
+</div>
+
+
+@code {
+    private IBrowserFile? selectedFile;
+    private string statusMessage = "No file selected.";
+    private bool isFileSelected = false;
+    private string qrCodeImageData = string.Empty;
+    private string qrCodeURL = string.Empty;
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+
+        if (selectedFile != null)
+        {
+            var fileExtension = Path.GetExtension(selectedFile.Name).ToLowerInvariant();
+            if (fileExtension == ".zip" || fileExtension == ".rar")
+            {
+                statusMessage = $"Selected file: {selectedFile.Name}";
+                isFileSelected = true;
+            }
+            else
+            {
+                statusMessage = "Please select a .zip or .rar file.";
+                isFileSelected = false;
+            }
+        }
+    }
+
+    private async Task UploadFile()
+    {
+        if (selectedFile == null)
+        {
+            statusMessage = "No file selected to upload.";
+            return;
+        }
+
+        try
+        {
+            using var httpClient = new HttpClient();
+            var content = new MultipartFormDataContent();
+
+            var fileStream = selectedFile.OpenReadStream(100 * 1024 * 1024); 
+            var streamContent = new StreamContent(fileStream);
+            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+            content.Add(streamContent, "file", selectedFile.Name);
+            
+            var response = await httpClient.PostAsync($"https://localhost:7264/api/fileupload/upload", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Read the response content
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Parse the JSON response to extract the QR code image data
+                var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
+                if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
+                {
+                    qrCodeImageData = qrCodeElement.GetString();
+                    statusMessage = "File uploaded successfully!";
+                }
+                else
+                {
+                    statusMessage = "File uploaded, but QR code not received.";
+                }
+
+                if (responseObject.RootElement.TryGetProperty("qrCodeURL", out var qrCodeURLElement))
+                {
+                    qrCodeURL = qrCodeURLElement.GetString();
+                    statusMessage = "File uploaded successfully!";
+                }
+                else
+                {
+                    statusMessage = "File uploaded, but QR code URL not received.";
+                }
+            }
+            else
+            {
+                statusMessage = $"Failed to upload file. Status code: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error uploading file: {ex.Message}";
+        }
+    }
+}

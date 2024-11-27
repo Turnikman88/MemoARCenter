@@ -1,0 +1,172 @@
+/* General Styling */
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #1C1C1C; /* Dark Grey */
+    color: #EFECE9; /* Soft Neutral for text */
+    margin: 0;
+    padding: 0;
+}
+
+/* File Upload Container */
+.file-upload-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: linear-gradient(145deg, #292929, #1C1C1C); /* Neutral Gradient */
+    border-radius: 15px;
+    border: 1px solid #AC9C8D; /* Taupe Border */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+/* Headers */
+.header, .preview-header {
+    font-size: 24px;
+    color: #EFECE9;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* File Input Styling */
+.file-input-area {
+    margin-bottom: 20px;
+}
+
+.file-input {
+    display: none; /* Hide default input */
+}
+
+.file-upload-button {
+    display: inline-block;
+    background-color: #740E33; /* Burgundy */
+    color: #EFECE9; /* Light text */
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+}
+
+    .file-upload-button:hover {
+        background-color: #8A1035; /* Lighter Burgundy */
+    }
+
+/* Centered Button */
+.button-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.upload-button {
+    background-color: #740E33;
+    color: #EFECE9;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .upload-button:hover {
+        background-color: #8A1035; /* Lighter Burgundy */
+        transform: translateY(-2px);
+    }
+
+/* Status Message */
+.upload-status {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #DDD9CE;
+}
+
+/* QR Code */
+.qr-code-area {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.qr-code {
+    max-width: 200px;
+    border: 5px solid #AC9C8D;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Top Toolbar */
+.navbar-custom {
+    background-color: #1C1C1C; /* Match the dark background */
+    border-bottom: 1px solid #AC9C8D; /* Add a subtle border for separation */
+    color: #EFECE9; /* Light text color */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* "About" Link Styling */
+.about-link {
+    color: #AC9C8D; /* Taupe color for the link */
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .about-link:hover {
+        color: #EFECE9; /* Lighter on hover */
+    }
+
+/* Content Area */
+.content {
+    padding: 20px;
+}
+
+/* Remove Sidebar (if needed in future) */
+.sidebar {
+    display: none; /* Temporarily hide the sidebar */
+}
+/* Container */
+.home-container {
+    text-align: center;
+    padding: 20px;
+    max-width: 90%; /* Ensures it looks good on smaller screens */
+    margin: 0 auto;
+}
+
+/* Welcome Title */
+.welcome-title {
+    color: #AC9C8D; /* Taupe color */
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+    .welcome-title .app-name {
+        color: #740E33; /* Burgundy */
+        font-weight: bold;
+    }
+
+/* Description Styling */
+.app-description {
+    background-color: #292929; /* Slightly lighter grey for contrast */
+    border: 1px solid #AC9C8D; /* Taupe border */
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Tagline */
+.app-tagline {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #740E33; /* Burgundy */
+}
