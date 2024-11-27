@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter", "MemoARCente
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter.Client", "MemoARCenter.Client\MemoARCenter.Client.csproj", "{2385EFC2-59FB-417F-A079-6526A1C1A24F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter.Services", "..\MemoARCenter.Services\MemoARCenter.Services.csproj", "{FB00FB0A-259E-4B61-BE72-6DE152143B6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoARCenter.Services", "MemoARCenter.Services\MemoARCenter.Services.csproj", "{FB00FB0A-259E-4B61-BE72-6DE152143B6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
