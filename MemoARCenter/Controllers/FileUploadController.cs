@@ -92,7 +92,7 @@ public class FileUploadController : ControllerBase
     [HttpGet("test")]
     public IActionResult Test()
     {
-        _dc.Test();
+        //_dc.Test();
 
         return Ok();
     }

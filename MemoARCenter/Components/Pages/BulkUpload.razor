@@ -1,0 +1,163 @@
+﻿@page "/bulk-upload"
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+
+<h3 class="page-title">Bulk Upload - Pair Videos and Images</h3>
+
+<div class="bulk-upload-container">
+    <!-- File Selection -->
+    <div class="file-selection">
+        <label for="file-upload" class="file-upload-button">Select Files</label>
+        <InputFile id="file-upload" multiple OnChange="HandleFilesSelected" class="hidden-input" />
+    </div>
+
+    <!-- Preview Area -->
+    <div class="preview-area">
+        <h4 class="section-title">Unpaired Files</h4>
+        <div class="unpaired-files">
+            @foreach (var file in unpairedFiles)
+            {
+                <div class="file-preview" @ondragstart="@(e => OnDragStart(e, file))" draggable="true">
+                    @if (file.ContentType.StartsWith("image"))
+                    {
+                        <img src="@file.PreviewUrl" alt="@file.Name" />
+                    }
+                    else if (file.ContentType.StartsWith("video"))
+                    {
+                        <div class="video-thumbnail">
+                            <p>🎥 Video</p>
+                            <button class="play-video-button" @onclick="() => PlayVideo(file)">Play</button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Drag-and-Drop Pairing -->
+    <div class="pairing-area">
+        <h4 class="section-title">Paired Files</h4>
+        <div class="paired-files">
+            @foreach (var pair in pairedFiles)
+            {
+                <div class="file-pair">
+                    <div>
+                        <h5>Image:</h5>
+                        <img src="@pair.Image.PreviewUrl" alt="@pair.Image.Name" />
+                    </div>
+                    <div>
+                        <h5>Video:</h5>
+                        <div class="video-thumbnail">
+                            <p>🎥 Video</p>
+                            <button class="play-video-button" @onclick="() => PlayVideo(pair.Video)">Play</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Upload Button -->
+    <div class="button-area">
+        <button @onclick="UploadPairs" class="upload-button" disabled="@(!pairedFiles.Any())">Upload Pairs</button>
+    </div>
+</div>
+
+@code {
+    private List<UploadedFile> unpairedFiles = new();
+    private List<FilePair> pairedFiles = new();
+
+    private async Task HandleFilesSelected(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var stream = file.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+
+            var uploadedFile = new UploadedFile
+                {
+                    Name = file.Name,
+                    ContentType = file.ContentType,
+                    Data = memoryStream.ToArray(),
+                    PreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}"
+                };
+
+            unpairedFiles.Add(uploadedFile);
+        }
+    }
+
+    private async Task OnDragStart(DragEventArgs e, UploadedFile file)
+    {
+        await JSRuntime.InvokeVoidAsync("setDragData", e, file.Name);
+    }
+
+    private async Task OnDrop(DragEventArgs e)
+    {
+        var draggedFileName = await JSRuntime.InvokeAsync<string>("getDragData", e);
+        var draggedFile = unpairedFiles.FirstOrDefault(f => f.Name == draggedFileName);
+
+        if (draggedFile != null)
+        {
+            var targetFile = unpairedFiles.FirstOrDefault(f => f != draggedFile);
+            if (targetFile != null)
+            {
+                if (draggedFile.ContentType.StartsWith("image") && targetFile.ContentType.StartsWith("video"))
+                {
+                    pairedFiles.Add(new FilePair { Image = draggedFile, Video = targetFile });
+                    unpairedFiles.Remove(draggedFile);
+                    unpairedFiles.Remove(targetFile);
+                }
+                else if (draggedFile.ContentType.StartsWith("video") && targetFile.ContentType.StartsWith("image"))
+                {
+                    pairedFiles.Add(new FilePair { Image = targetFile, Video = draggedFile });
+                    unpairedFiles.Remove(draggedFile);
+                    unpairedFiles.Remove(targetFile);
+                }
+            }
+        }
+    }
+
+    private async Task UploadPairs()
+    {
+        foreach (var pair in pairedFiles)
+        {
+            using var httpClient = new HttpClient();
+            var content = new MultipartFormDataContent();
+
+            content.Add(new ByteArrayContent(pair.Video.Data), "video", pair.Video.Name);
+            content.Add(new ByteArrayContent(pair.Image.Data), "image", pair.Image.Name);
+
+            var response = await httpClient.PostAsync("https://localhost:7264/api/fileupload/pairupload", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to upload pair: {pair.Image.Name} and {pair.Video.Name}");
+            }
+        }
+
+        pairedFiles.Clear();
+        unpairedFiles.Clear();
+    }
+
+    private void PlayVideo(UploadedFile file)
+    {
+        var url = file.PreviewUrl;
+        JSRuntime.InvokeVoidAsync("window.open", url, "_blank");
+    }
+
+    private class UploadedFile
+    {
+        public string Name { get; set; }
+        public string ContentType { get; set; }
+        public byte[] Data { get; set; }
+        public string PreviewUrl { get; set; }
+    }
+
+    private class FilePair
+    {
+        public UploadedFile Image { get; set; }
+        public UploadedFile Video { get; set; }
+    }
+}

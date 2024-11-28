@@ -170,3 +170,238 @@ body {
     font-weight: bold;
     color: #740E33; /* Burgundy */
 }
+
+.bulk-upload-container {
+    padding: 15px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #f1f1f1;
+}
+
+.file-selection {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.file-upload-button {
+    background-color: #800020;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .file-upload-button:hover {
+        background-color: #a6002d;
+    }
+
+.hidden-input {
+    display: none;
+}
+
+.unpaired-files, .paired-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.file-preview, .file-pair {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+    .file-preview img, .file-pair img {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+.video-thumbnail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f3f3;
+    border: 1px solid #ddd;
+    width: 100px;
+    height: 80px;
+    font-size: 0.8rem;
+    text-align: center;
+    border-radius: 4px;
+    color: #555;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.play-video-button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .play-video-button:hover {
+        background-color: #0056b3;
+    }
+
+.button-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.upload-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #800020;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .upload-button:hover {
+        background-color: #a6002d;
+    }
+
+@media (max-width: 768px) {
+    .file-preview, .file-pair {
+        width: 80px;
+    }
+}
+.bulk-upload-container {
+    padding: 15px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #f1f1f1;
+}
+
+.file-selection {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.file-upload-button {
+    background-color: #800020;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .file-upload-button:hover {
+        background-color: #a6002d;
+    }
+
+.hidden-input {
+    display: none;
+}
+
+.unpaired-files, .paired-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.file-preview, .file-pair {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+    .file-preview img, .file-pair img {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+.video-thumbnail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f3f3;
+    border: 1px solid #ddd;
+    width: 100px;
+    height: 80px;
+    font-size: 0.8rem;
+    text-align: center;
+    border-radius: 4px;
+    color: #555;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.play-video-button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.play-video-button:hover {
+    background-color: #0056b3;
+}
+
+.button-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.upload-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #800020;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .upload-button:hover {
+        background-color: #a6002d;
+    }
+
+@media (max-width: 768px) {
+    .file-preview, .file-pair {
+        width: 80px;
+    }
+}
