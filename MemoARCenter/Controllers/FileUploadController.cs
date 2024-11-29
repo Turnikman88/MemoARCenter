@@ -1,4 +1,5 @@
 ﻿using MemoARCenter.Services.Contracts;
+using MemoARCenter.Services.Models;
 using MemoARCenter.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,84 @@ public class FileUploadController : ControllerBase
         _env = env;
         _qr = qr;
     }
+/*
+    [HttpPost("bulkupload")]
+    public async Task<IActionResult> UploadFiles()
+    {
+        if (!Request.HasFormContentType)
+        {
+            return BadRequest("Unsupported content type.");
+        }
+
+        var form = Request.Form;
+        var uploadedImages = new List<FilePreviewModel>();
+        var uploadedVideos = new List<FilePreviewModel>();
+
+        try
+        {
+            foreach (var formFile in form.Files)
+            {
+                if (formFile.Length > 0)
+                {
+                    using var memoryStream = new MemoryStream();
+                    await formFile.CopyToAsync(memoryStream);
+
+                    var fileData = new FilePreviewModel
+                    {
+                        Name = formFile.FileName,
+                        ContentType = formFile.ContentType,
+                        Content = memoryStream.ToArray()
+                    };
+
+                    // Classify as image or video based on MIME type
+                    if (fileData.ContentType.StartsWith("image"))
+                    {
+                        uploadedImages.Add(fileData);
+                    }
+                    else if (fileData.ContentType.StartsWith("video"))
+                    {
+                        uploadedVideos.Add(fileData);
+                    }
+                }
+            }
+
+            // Match images and videos (you may need a custom matching logic based on naming convention, etc.)
+            var pairedFiles = new List<ImageVideoPair>();
+            foreach (var image in uploadedImages)
+            {
+                var matchingVideo = uploadedVideos.FirstOrDefault(video =>
+                    Path.GetFileNameWithoutExtension(video.Name) == Path.GetFileNameWithoutExtension(image.Name));
+
+                if (matchingVideo != null)
+                {
+                    pairedFiles.Add(new ImageVideoPair
+                    {
+                        Image = image,
+                        Video = matchingVideo
+                    });
+
+                    // Remove paired video to avoid duplicate pairing
+                    uploadedVideos.Remove(matchingVideo);
+                }
+            }
+
+            // Save paired files to storage or database
+            foreach (var pair in pairedFiles)
+            {
+                // Save image
+                await SaveFileAsync(pair.Image, "images");
+
+                // Save video
+                await SaveFileAsync(pair.Video, "videos");
+            }
+
+            return Ok(new { Message = "Files uploaded successfully!", PairsUploaded = pairedFiles.Count });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Error = ex.Message });
+        }
+    }*/
 
     [HttpPost("upload")]
     public async Task<IActionResult> UploadFile(IFormFile file)
@@ -87,6 +166,14 @@ public class FileUploadController : ControllerBase
             contentType = "application/octet-stream"; 
         }
         return contentType;
+    }
+
+    private async Task SaveFileAsync(FilePreviewModel file, string folder)
+    {
+        var path = Path.Combine("wwwroot", folder, file.Name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+
+        await System.IO.File.WriteAllBytesAsync(path, file.Content);
     }
 
     [HttpGet("test")]
