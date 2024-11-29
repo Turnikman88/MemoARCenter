@@ -1,7 +1,7 @@
 ﻿/* Updated CSS */
 
 /* Container for the entire upload area */
-.file-upload-container {
+/*.file-upload-container {
     max-width: 600px;
     margin: 20px auto;
     padding: 20px;
@@ -9,44 +9,44 @@
     color: #EFECE9;
     border-radius: 10px;
     text-align: center;
-}
+}*/
 
 /* Use CSS Grid for the preview area */
-.preview-area {
+/*.preview-area {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Exactly two columns */
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);*/ /* Exactly two columns */
+    /*gap: 20px;
     margin-top: 20px;
     justify-items: center;
-}
+}*/
 
 
 
 /* Style for each preview item */
-.preview-item {
+/*.preview-item {
     display: flex;
-    flex-direction: column; /* Stack content vertically */
-    align-items: center; /* Center content horizontally */
-    gap: 10px;
+    flex-direction: column;*/ /* Stack content vertically */
+    /*align-items: center;*/ /* Center content horizontally */
+    /*gap: 10px;
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 8px;
     background-color: #292929;
     width: 100%;
-    max-width: 300px; /* Optional max-width */
-    box-sizing: border-box;
-}
+    max-width: 300px;*/ /* Optional max-width */
+    /*box-sizing: border-box;
+}*/
 
 /* Make preview images responsive */
-.preview-image {
+/*.preview-image {
     width: 100%;
     height: auto;
-    max-width: 100%; /* Ensure images don't exceed container width */
-    border-radius: 8px;
-}
+    max-width: 100%;*/ /* Ensure images don't exceed container width */
+    /*border-radius: 8px;
+}*/
 
 /* Style for the 'Select Images' and 'Select Video' buttons */
-.file-upload-button,
+/*.file-upload-button,
 .upload-button,
 .video-upload-button {
     background-color: #740E33;
@@ -59,10 +59,10 @@
     text-transform: uppercase;
     transition: background-color 0.3s ease, transform 0.2s ease;
     border: 2px solid transparent;
-}
+}*/
 
     /* Hover and active states for buttons */
-    .file-upload-button:hover,
+    /*.file-upload-button:hover,
     .upload-button:hover,
     .video-upload-button:hover {
         background-color: #8A1035;
@@ -73,37 +73,37 @@
     .upload-button:active,
     .video-upload-button:active {
         transform: scale(0.98);
-    }
+    }*/
 
 /* Center the button area */
-.button-area {
+/*.button-area {
     margin-top: 20px;
     text-align: center;
-}
+}*/
 
 /* Style for the upload status message */
-.upload-status {
+/*.upload-status {
     margin-top: 10px;
     font-weight: bold;
     color: #EFECE9;
-}
+}*/
 
 /* Hide elements with the 'hidden' class */
-.hidden {
+/*.hidden {
     display: none;
-}
+}*/
 
 /* Style for the video selection container */
-.video-selection-container {
+/*.video-selection-container {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content within the container */
-    gap: 10px;
+    align-items: center;*/ /* Center content within the container */
+    /*gap: 10px;
     margin-top: 10px;
-}
+}*/
 
 /* Make preview videos responsive */
-.preview-video {
+/*.preview-video {
     width: 100%;
     height: auto;
     max-width: 100%;
@@ -112,10 +112,10 @@
     object-fit: cover;
     background-color: #000;
     margin-top: 10px;
-}
+}*/
 
 /* Style for the video selected indicator */
-.video-selected-indicator {
+/*.video-selected-indicator {
     background-color: #4CAF50;
     color: white;
     padding: 5px 10px;
@@ -125,15 +125,15 @@
     text-align: center;
     border: 1px solid #3E8E41;
     margin-top: 5px;
-}
+}*/
 
 /* Responsive adjustments */
-@media screen and (max-width: 600px) {
+/*@media screen and (max-width: 600px) {
     .preview-area {
-        grid-template-columns: 1fr; /* Display one item per row on small screens */
-    }
+        grid-template-columns: 1fr;*/ /* Display one item per row on small screens */
+    /*}
 
     .preview-item {
-        max-width: 100%; /* Allow items to use full width on mobile */
-    }
-}
+        max-width: 100%;*/ /* Allow items to use full width on mobile */
+    /*}
+}*/
