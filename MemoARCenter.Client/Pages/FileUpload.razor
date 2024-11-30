@@ -172,10 +172,15 @@
 			// Add all previews to the uploadedImages list
 			uploadedImages.AddRange(previews);
 		}
+		catch (IOException ex) when (ex.Message.Contains("failed to read requested number of bytes from the stream"))
+		{
+			// Handle the specific stream read error
+			await JSRuntime.InvokeVoidAsync("alert", "Error: Failed to read the file. The file might be too large or corrupted.");
+		}
 		catch (Exception eer)
 		{
 			
-			throw;
+			await JSRuntime.InvokeVoidAsync("alert", $"Error: {eer.Message}");
 		}
 		
 	}

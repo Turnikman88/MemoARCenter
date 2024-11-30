@@ -1,18 +1,18 @@
 /* General Styling */
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #1C1C1C; /* Dark Grey */
+    background-color: #0f0f0f; /* Dark Grey */
     color: #EFECE9; /* Soft Neutral for text */
     margin: 0;
     padding: 0;
-}
+  }
 
 /* File Upload Container */
 .file-upload-container {
     max-width: 90%; /* Adjusted for responsiveness */
     margin: 20px auto;
     padding: 20px;
-    background: linear-gradient(145deg, #292929, #1C1C1C); /* Neutral Gradient */
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f); /* Neutral Gradient */
     border-radius: 15px;
     border: 1px solid #AC9C8D; /* Taupe Border */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -39,7 +39,7 @@ body {
 
 .file-upload-button {
     display: inline-block;
-    background-color: #740E33; /* Burgundy */
+    background-color: #D70040	; /* Burgundy */
     color: #EFECE9; /* Light text */
     padding: 10px 20px;
     font-size: 16px; /* Ensure consistent font size */
@@ -52,7 +52,7 @@ body {
 }
 
     .file-upload-button:hover {
-        background-color: #8A1035; /* Lighter Burgundy */
+        background-color: #D2042D; /* Lighter Burgundy */
         transform: translateY(-2px);
     }
 
@@ -62,7 +62,7 @@ body {
 
 /* Video Upload Button */
 .video-upload-button {
-    background-color: #740E33;
+    background-color: #D70040	;
     color: #EFECE9;
     padding: 10px 20px;
     font-size: 14px;
@@ -75,7 +75,7 @@ body {
 }
 
     .video-upload-button:hover {
-        background-color: #8A1035;
+        background-color: #D2042D;
         transform: translateY(-2px);
     }
 
@@ -90,7 +90,7 @@ body {
 }
 
 .upload-button {
-    background-color: #740E33;
+    background-color: #D70040	;
     color: #EFECE9;
     padding: 10px 20px;
     font-size: 16px;
@@ -102,7 +102,7 @@ body {
 }
 
     .upload-button:hover {
-        background-color: #8A1035; /* Lighter Burgundy */
+        background-color: #D2042D; /* Lighter Burgundy */
         transform: translateY(-2px);
     }
 
@@ -129,7 +129,7 @@ body {
 
 /* Top Toolbar */
 .navbar-custom {
-    background-color: #1C1C1C; /* Match the dark background */
+    background-color: #0f0f0f; /* Match the dark background */
     border-bottom: 1px solid #AC9C8D; /* Add a subtle border for separation */
     color: #EFECE9; /* Light text color */
     display: flex;
@@ -177,13 +177,13 @@ body {
 }
 
     .welcome-title .app-name {
-        color: #740E33; /* Burgundy */
+        color: #D70040	; /* Burgundy */
         font-weight: bold;
     }
 
 /* Description Styling */
 .app-description {
-    background-color: #292929; /* Slightly lighter grey for contrast */
+    background-color: #1a1a1a; /* Slightly lighter grey for contrast */
     border: 1px solid #AC9C8D; /* Taupe border */
     border-radius: 10px;
     padding: 15px;
@@ -198,7 +198,7 @@ body {
     margin-top: 20px;
     font-size: 1.1rem;
     font-weight: bold;
-    color: #740E33; /* Burgundy */
+    color: #D70040	; /* Burgundy */
 }
 
 /* Preview Area */
@@ -219,7 +219,7 @@ body {
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 8px;
-    background-color: #292929;
+    background-color: #1a1a1a;
     color: #EFECE9;
     width: 100%;
     max-width: 300px; /* Optional max-width */
@@ -335,4 +335,47 @@ body {
     color: #555;
     margin-top: 8px;
     text-align: center;
+}
+
+/* Background with blurred red circles */
+
+
+/* Create the container for animated blurred circles */
+/* Background with blurred red circles */
+.background-circles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Ensure interactions pass through to other elements */
+    z-index: -1; /* Place behind other content */
+    overflow: hidden;
+    background: linear-gradient(145deg, #0f0f0f, #0f0f0f); /* Match the base background color */
+}
+
+/* Style for individual circles */
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(210, 4, 45, 0.8); /* Slightly transparent #D2042D for blending */
+    filter: blur(80px); /* Increase blur for smoother edges */
+    animation: float 10s infinite ease-in-out;
+    opacity: 0.9; /* Slightly translucent for blending */
+    mix-blend-mode: screen; /* Smooth blending with the background */
+}
+
+/* Floating animation */
+@keyframes float {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(20px, -30px) scale(1.2);
+    }
+
+    100% {
+        transform: translate(-20px, 30px) scale(1);
+    }
 }
