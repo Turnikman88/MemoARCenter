@@ -1,0 +1,409 @@
+﻿@page "/file-upload"
+@using MemoARCenter.Services.Models
+@rendermode InteractiveWebAssembly
+@inject IJSRuntime JSRuntime
+
+
+<div class="file-upload-container">
+	<h3 class="header">Upload Images</h3>
+
+	<div class="file-input-area">
+		<InputFile accept="image/*" enctype="multipart/form-data" id="file-input" OnChange="HandleImageSelected" Multiple="true" maxFiles="20" class="file-input" />
+		<label for="file-input" class="file-upload-button">
+			Select Images
+		</label>
+	</div>
+
+	@if (isImagesLoading)
+	{
+		<p class="loading-message">Loading Images...</p>
+	}
+
+	@if (uploadedImages.Count > 0)
+	{
+		<div class="preview-area">
+			@foreach (var image in uploadedImages)
+			{
+				<div class="preview-item">
+					<img src="@image.DataUrl" alt="@image.Name" class="preview-image" />
+					<div class="video-selection-container">
+						<button type="button" class="file-upload-button video-upload-button" @onclick="() => TriggerVideoInputClick(image.Name)">
+							Select Video
+						</button>
+						<InputFile id="@($"video-input-{image.Name}")" accept="video/*" class="file-input video-input hidden" OnChange="@((e) => HandleVideoSelected(e, image))" />
+
+						@if (!image.IsVideoLoaded)
+						{
+							<p class="loading-message">Loading video...</p>
+						}
+						@if (!string.IsNullOrEmpty(image.AssociatedVideoUrl))
+						{
+							<div>
+								<video src="@image.AssociatedVideoUrl" class="preview-video" controls
+								@onloadeddata="() => MarkVideoAsLoaded(image)">
+								</video>
+
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	}
+	else
+	{
+		<p class="empty-preview">No images selected yet.</p>
+	}
+	<div class="button-area">
+		<button @onclick="UploadImagesAndVideos" class="upload-button">Upload</button>
+	</div>
+
+	@if (!string.IsNullOrEmpty(uploadStatus))
+	{
+		<p class="upload-status">@uploadStatus</p>
+	}
+
+	@if (!string.IsNullOrEmpty(qrCodeImageData))
+	{
+		<div class="qr-code-area">
+			<h4 class="preview-header">Your QR Code:</h4>
+			<a href="@qrCodeURL" target="_blank">
+				<img src="@qrCodeImageData" alt="QR Code" class="qr-code" />
+			</a>
+		</div>
+	}
+
+</div>
+
+<script>
+	window.triggerInputClick = (inputId) => {
+	const inputFile = document.getElementById(inputId);
+	if (inputFile) {
+	inputFile.click();
+	}
+	};
+
+		window.resetFileInput = (id) => {
+		const inputFile = document.getElementById(id);
+		if (inputFile) {
+			inputFile.value = ""; // Clear the file input on load
+		}
+	};
+
+</script>
+
+<script>
+	window.siteJs = {
+	createObjectUrl: (fileData) => {
+	// Convert the raw file data into a Blob object
+	const blob = new Blob([fileData.arrayBuffer], { type: fileData.type });
+	return URL.createObjectURL(blob); // Create an object URL for the Blob
+	},
+	revokeObjectUrl: (url) => {
+	URL.revokeObjectURL(url); // Revoke the object URL when it's no longer needed
+	},
+	getBlobData: async (url) => {
+	const response = await fetch(url);
+	const blob = await response.blob();
+	return new Uint8Array(await blob.arrayBuffer());
+	}
+	};
+</script>
+
+
+
+@code {
+	private List<FilePreviewModel> uploadedImages = new();
+	private Dictionary<FilePreviewModel, FilePreviewModel?> imageToVideoMap = new();
+	private string? uploadStatus;
+	private string qrCodeImageData = string.Empty;
+	private string qrCodeURL = string.Empty;
+
+
+	private bool isImagesLoading;
+
+
+	private async Task HandleImageSelected(InputFileChangeEventArgs e)
+	{
+		try
+		{
+			isImagesLoading = true;
+			uploadedImages.Clear();
+
+			// Use a semaphore to limit the number of concurrent tasks
+			var semaphore = new SemaphoreSlim(5); // Limit to 5 concurrent tasks
+			var tasks = e.GetMultipleFiles(25)
+				.Where(file => file != null && file.Size > 0 && file.ContentType.StartsWith("image"))
+				.Select(async file =>
+				{
+					await semaphore.WaitAsync();
+
+					try
+					{
+						using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // Max 10MB
+						using var memoryStream = new MemoryStream();
+						await stream.CopyToAsync(memoryStream);
+						var fileData = memoryStream.ToArray();
+
+						// Pass the raw file data to JavaScript for generating the object URL
+						var objectUrl = await JSRuntime.InvokeAsync<string>("siteJs.createObjectUrl", new
+						{
+							arrayBuffer = fileData,
+							type = file.ContentType
+						});
+
+						return new FilePreviewModel
+							{
+								Name = file.Name,
+								DataUrl = objectUrl,
+								IsVideoLoaded = true
+							};
+					}
+					finally
+					{
+						semaphore.Release();
+						isImagesLoading = false;
+					}
+				});
+
+			// Wait for all tasks to complete and collect the results
+			var previews = await Task.WhenAll(tasks);
+
+			// Add all previews to the uploadedImages list
+			uploadedImages.AddRange(previews);
+		}
+		catch (Exception eer)
+		{
+			
+			throw;
+		}
+		
+	}
+
+
+	private async Task HandleVideoSelected(InputFileChangeEventArgs e, FilePreviewModel image)
+	{
+
+		image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
+		StateHasChanged();
+		var videoFile = e.File;
+		if (videoFile == null || videoFile.Size == 0 || !videoFile.ContentType.StartsWith("video"))
+			return;
+
+		using var stream = videoFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024); // Max 50MB
+		using var memoryStream = new MemoryStream();
+		await stream.CopyToAsync(memoryStream);
+		var fileData = memoryStream.ToArray();
+
+		var videoUrl = await JSRuntime.InvokeAsync<string>("siteJs.createObjectUrl", new
+		{
+			arrayBuffer = fileData,
+			type = videoFile.ContentType
+		});
+
+		image.AssociatedVideoUrl = videoUrl; // Store the object URL for video preview
+		image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
+
+
+	}
+
+	private async Task UploadImagesAndVideos()
+	{
+		if (uploadedImages.Count == 0)
+		{
+			uploadStatus = "No images selected.";
+			return;
+		}
+
+		try
+		{
+			// Create a ZIP archive in memory
+			using var zipStream = new MemoryStream();
+			using (var archive = new System.IO.Compression.ZipArchive(zipStream, System.IO.Compression.ZipArchiveMode.Create, true))
+			{
+				int fileIndex = 1;
+
+				foreach (var image in uploadedImages)
+				{
+					if (string.IsNullOrEmpty(image.AssociatedVideoUrl))
+					{
+						// Skip images without associated videos
+						continue;
+					}
+
+					try
+					{
+						// Add the image to the ZIP archive
+						var imageData = await JSRuntime.InvokeAsync<byte[]>("siteJs.getBlobData", image.DataUrl);
+						var imageExtension = Path.GetExtension(image.Name) ?? ".jpg";
+						var imageEntry = archive.CreateEntry($"{fileIndex}{imageExtension}", System.IO.Compression.CompressionLevel.Fastest);
+
+						using (var entryStream = imageEntry.Open())
+						{
+							await entryStream.WriteAsync(imageData, 0, imageData.Length);
+						}
+
+						// Add the video to the ZIP archive
+						var videoData = await JSRuntime.InvokeAsync<byte[]>("siteJs.getBlobData", image.AssociatedVideoUrl);
+						var videoExtension = ".mp4"; // Default extension
+						var videoEntry = archive.CreateEntry($"{fileIndex}{videoExtension}", System.IO.Compression.CompressionLevel.Fastest);
+
+						using (var entryStream = videoEntry.Open())
+						{
+							await entryStream.WriteAsync(videoData, 0, videoData.Length);
+						}
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine($"Error processing file {image.Name}: {e.Message}");
+					}
+
+					fileIndex++;
+				}
+			}
+
+			// Reset the stream position before sending it
+			zipStream.Position = 0;
+
+			HttpResponseMessage response;
+			try
+			{
+				using var httpClient = new HttpClient();
+				using var content = new MultipartFormDataContent();
+
+				// Add the ZIP file to the form
+				var zipContent = new StreamContent(zipStream);
+				zipContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/zip");
+				content.Add(zipContent, "file", "uploaded_files.zip");
+
+				// Send the POST request
+				response = await httpClient.PostAsync("https://localhost:7264/api/fileupload/upload", content);
+			}
+			catch (Exception ex)
+			{
+				uploadStatus = "Network error while uploading.";
+				Console.WriteLine($"HTTP upload failed: {ex.Message}");
+				return;
+			}
+
+			// Check the response status
+			if (response.IsSuccessStatusCode)
+			{
+				 var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Parse the JSON response to extract the QR code image data
+                var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
+
+
+				if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
+				{
+					qrCodeImageData = qrCodeElement.GetString();
+					uploadStatus = "File uploaded successfully!";
+				}
+				else
+				{
+					uploadStatus = "File uploaded, but QR code not received.";
+				}
+
+				if (responseObject.RootElement.TryGetProperty("qrCodeURL", out var qrCodeURLElement))
+				{
+					qrCodeURL = qrCodeURLElement.GetString();
+					uploadStatus = "File uploaded successfully!";
+				}
+				else
+				{
+					uploadStatus = "File uploaded, but QR code URL not received.";
+				}
+			}
+			else
+			{
+				uploadStatus = $"Upload failed. Status Code: {response.StatusCode}";
+			}
+		}
+		catch (Exception ex)
+		{
+			uploadStatus = $"Error: {ex.Message}";
+		}
+	}
+
+	private void MarkVideoAsLoaded(FilePreviewModel image)
+	{
+		// await Task.Delay(50); // Add a small delay
+		image.IsVideoLoaded = true;
+		// StateHasChanged(); // Trigger UI update
+	}
+
+	private async Task TriggerVideoInputClick(string imageName)
+	{
+		var inputId = $"video-input-{imageName}";
+		await JSRuntime.InvokeVoidAsync("triggerInputClick", inputId);
+	}
+
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			// Reset the file input using JS interop
+			await JSRuntime.InvokeVoidAsync("resetFileInput", "file-input");
+		}
+	}
+
+	// private async Task UploadImagesAndVideos()
+	// {
+	// 	if (uploadedImages.Count == 0)
+	// 	{
+	// 		uploadStatus = "No images selected.";
+	// 		return;
+	// 	}
+
+	// 	try
+	// 	{
+	// 		using var httpClient = new HttpClient();
+	// 		using var content = new MultipartFormDataContent();
+
+	// 		foreach (var image in uploadedImages)
+	// 		{
+	// 			if (!imageToVideoMap.ContainsKey(image) || imageToVideoMap[image] == null)
+	// 			{
+	// 				// Skip images without videos
+	// 				continue;
+	// 			}
+
+	// 			// Add image to the request
+	// 			var imageContent = new StreamContent(new MemoryStream(image.Content));
+	// 			imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(image.ContentType);
+	// 			content.Add(imageContent, "images", image.Name);
+
+	// 			// Add linked video to the request
+	// 			var video = imageToVideoMap[image]!;
+	// 			var videoContent = new StreamContent(new MemoryStream(video.Content));
+	// 			videoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(video.ContentType);
+	// 			content.Add(videoContent, "videos", video.Name);
+	// 		}
+
+	// 		var response = await httpClient.PostAsync("https://0.0.0.0:7264/api/fileupload/bulkupload", content);
+
+	// 		if (response.IsSuccessStatusCode)
+	// 		{
+	// 			uploadStatus = "Images and videos uploaded successfully!";
+	// 		}
+	// 		else
+	// 		{
+	// 			uploadStatus = $"Upload failed. Status Code: {response.StatusCode}";
+	// 		}
+	// 	}
+	// 	catch (Exception ex)
+	// 	{
+	// 		uploadStatus = $"Error: {ex.Message}";
+	// 	}
+	// }
+
+	private class FilePreviewModel
+	{
+		public string Name { get; set; }
+		public string DataUrl { get; set; } // Object URL for the image
+		public string? AssociatedVideoUrl { get; set; } // Object URL for the associated video
+		public bool IsVideoLoaded { get; set; } // Tracks whether the video has finished loading
+	}
+}

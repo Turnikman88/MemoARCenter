@@ -16,11 +16,22 @@ namespace MemoARCenter
                 .AddInteractiveWebAssemblyComponents();
 
             builder.Services.AddControllers();
+            builder.Services.AddServerSideBlazor();
 
             builder.Services.AddScoped<IDBCreator, DBCreatorService>();
             builder.Services.AddScoped<IImageEdit,ImageEditService>();
             builder.Services.AddScoped<IVideoEdit,VideoEditService>();
             builder.Services.AddScoped<IQRCode, QRCodeService>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()  // Allow requests from any origin
+                          .AllowAnyHeader()  // Allow any headers
+                          .AllowAnyMethod(); // Allow any HTTP method (GET, POST, PUT, DELETE, etc.)
+                });
+            });
 
             var app = builder.Build();
 
@@ -40,6 +51,8 @@ namespace MemoARCenter
 
             app.UseStaticFiles();
             app.UseAntiforgery();
+
+            app.UseCors();
 
             app.MapControllers();
 
