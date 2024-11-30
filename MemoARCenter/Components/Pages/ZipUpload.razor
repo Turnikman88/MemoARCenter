@@ -1,6 +1,8 @@
 ﻿@page "/upload-zip"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Forms
+@inject IConfiguration Configuration
+
 
 <div class="file-upload-container">
     <h3 class="header">Upload Archive</h3>
@@ -73,7 +75,9 @@
             streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
             content.Add(streamContent, "file", selectedFile.Name);
             
-            var response = await httpClient.PostAsync($"https://localhost:7264/api/fileupload/upload", content);
+            var host = Configuration["AppSettings:Host"];
+
+            var response = await httpClient.PostAsync($"https://{host}/api/fileupload/upload", content);
 
             if (response.IsSuccessStatusCode)
             {

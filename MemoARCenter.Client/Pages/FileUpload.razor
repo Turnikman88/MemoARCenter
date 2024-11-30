@@ -1,7 +1,11 @@
 ﻿@page "/file-upload"
 @using MemoARCenter.Services.Models
+@using MemoARCenter.Models
+@using Microsoft.Extensions.Options
 @rendermode InteractiveWebAssembly
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+@inject IOptions<AppSettings> AppSettings
 
 
 <div class="file-upload-container">
@@ -83,11 +87,11 @@
 	}
 	};
 
-		window.resetFileInput = (id) => {
-		const inputFile = document.getElementById(id);
-		if (inputFile) {
-			inputFile.value = ""; // Clear the file input on load
-		}
+	window.resetFileInput = (id) => {
+	const inputFile = document.getElementById(id);
+	if (inputFile) {
+	inputFile.value = ""; // Clear the file input on load
+	}
 	};
 
 </script>
@@ -106,6 +110,10 @@
 	const response = await fetch(url);
 	const blob = await response.blob();
 	return new Uint8Array(await blob.arrayBuffer());
+	},
+	isIphone: () => {
+	const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+	return /iPhone|iPad|iPod|Mac/i.test(userAgent);
 	}
 	};
 </script>
@@ -118,6 +126,7 @@
 	private string? uploadStatus;
 	private string qrCodeImageData = string.Empty;
 	private string qrCodeURL = string.Empty;
+	private bool isIphone;
 
 
 	private bool isImagesLoading;
@@ -131,7 +140,7 @@
 			uploadedImages.Clear();
 
 			// Use a semaphore to limit the number of concurrent tasks
-			var semaphore = new SemaphoreSlim(5); // Limit to 5 concurrent tasks
+			var semaphore = new SemaphoreSlim(isIphone ? 1 : 5); // Limit to 5 concurrent tasks
 			var tasks = e.GetMultipleFiles(25)
 				.Where(file => file != null && file.Size > 0 && file.ContentType.StartsWith("image"))
 				.Select(async file =>
@@ -179,35 +188,43 @@
 		}
 		catch (Exception eer)
 		{
-			
+
 			await JSRuntime.InvokeVoidAsync("alert", $"Error: {eer.Message}");
 		}
-		
+
 	}
 
 
 	private async Task HandleVideoSelected(InputFileChangeEventArgs e, FilePreviewModel image)
 	{
-
-		image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
-		StateHasChanged();
-		var videoFile = e.File;
-		if (videoFile == null || videoFile.Size == 0 || !videoFile.ContentType.StartsWith("video"))
-			return;
-
-		using var stream = videoFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024); // Max 50MB
-		using var memoryStream = new MemoryStream();
-		await stream.CopyToAsync(memoryStream);
-		var fileData = memoryStream.ToArray();
-
-		var videoUrl = await JSRuntime.InvokeAsync<string>("siteJs.createObjectUrl", new
+		try
 		{
-			arrayBuffer = fileData,
-			type = videoFile.ContentType
-		});
+			image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
+											//StateHasChanged();
+			var videoFile = e.File;
+			if (videoFile == null || videoFile.Size == 0 || !videoFile.ContentType.StartsWith("video"))
+				return;
 
-		image.AssociatedVideoUrl = videoUrl; // Store the object URL for video preview
-		image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
+			using var stream = videoFile.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024); // Max 50MB
+			using var memoryStream = new MemoryStream();
+			await stream.CopyToAsync(memoryStream);
+			var fileData = memoryStream.ToArray();
+
+			var videoUrl = await JSRuntime.InvokeAsync<string>("siteJs.createObjectUrl", new
+			{
+				arrayBuffer = fileData,
+				type = videoFile.ContentType
+			});
+
+			image.AssociatedVideoUrl = videoUrl; // Store the object URL for video preview
+			image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
+
+		}
+		catch (Exception ee)
+		{
+
+			await JSRuntime.InvokeVoidAsync("alert", $"Error: {ee.Message}");
+		}
 
 
 	}
@@ -282,7 +299,9 @@
 				content.Add(zipContent, "file", "uploaded_files.zip");
 
 				// Send the POST request
-				response = await httpClient.PostAsync("https://localhost:7264/api/fileupload/upload", content);
+				var host = Configuration["Host"];
+				var url = $"{host}/api/fileupload/upload";
+				response = await httpClient.PostAsync(url, content);
 			}
 			catch (Exception ex)
 			{
@@ -294,10 +313,10 @@
 			// Check the response status
 			if (response.IsSuccessStatusCode)
 			{
-				 var responseContent = await response.Content.ReadAsStringAsync();
+				var responseContent = await response.Content.ReadAsStringAsync();
 
-                // Parse the JSON response to extract the QR code image data
-                var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
+				// Parse the JSON response to extract the QR code image data
+				var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
 
 
 				if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
@@ -349,10 +368,26 @@
 	{
 		if (firstRender)
 		{
+			isIphone = await JSRuntime.InvokeAsync<bool>("siteJs.isIphone");
+
+			// Debugging or conditional logic based on the result
+			if (isIphone)
+			{
+				await JSRuntime.InvokeVoidAsync("alert", $"It is a hotdog.");
+			}
+			else
+			{
+				await JSRuntime.InvokeVoidAsync("alert", $"It is NOT a hotdog.");
+
+			}
 			// Reset the file input using JS interop
 			await JSRuntime.InvokeVoidAsync("resetFileInput", "file-input");
 		}
 	}
+
+
+
+
 
 	// private async Task UploadImagesAndVideos()
 	// {

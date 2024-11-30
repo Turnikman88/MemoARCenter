@@ -1,5 +1,6 @@
 using MemoARCenter.Client.Pages;
 using MemoARCenter.Components;
+using MemoARCenter.Models;
 using MemoARCenter.Services.Contracts;
 using MemoARCenter.Services.Services;
 namespace MemoARCenter
@@ -32,6 +33,10 @@ namespace MemoARCenter
                           .AllowAnyMethod(); // Allow any HTTP method (GET, POST, PUT, DELETE, etc.)
                 });
             });
+
+            var config = builder.Configuration;
+            builder.Services.Configure<AppSettings>(config.GetSection("AppSettings"));
+
 
             var app = builder.Build();
 

@@ -17,92 +17,94 @@ public class FileUploadController : ControllerBase
     private readonly IDBCreator _dc;
     private readonly IWebHostEnvironment _env;
     private readonly IQRCode _qr;
+    private readonly IConfiguration _config;
 
 
-    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr)
+    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr, IConfiguration config)
     {
         _dc = dbCreatorService;
         _env = env;
         _qr = qr;
+        _config = config;
     }
-/*
-    [HttpPost("bulkupload")]
-    public async Task<IActionResult> UploadFiles()
-    {
-        if (!Request.HasFormContentType)
+    /*
+        [HttpPost("bulkupload")]
+        public async Task<IActionResult> UploadFiles()
         {
-            return BadRequest("Unsupported content type.");
-        }
-
-        var form = Request.Form;
-        var uploadedImages = new List<FilePreviewModel>();
-        var uploadedVideos = new List<FilePreviewModel>();
-
-        try
-        {
-            foreach (var formFile in form.Files)
+            if (!Request.HasFormContentType)
             {
-                if (formFile.Length > 0)
+                return BadRequest("Unsupported content type.");
+            }
+
+            var form = Request.Form;
+            var uploadedImages = new List<FilePreviewModel>();
+            var uploadedVideos = new List<FilePreviewModel>();
+
+            try
+            {
+                foreach (var formFile in form.Files)
                 {
-                    using var memoryStream = new MemoryStream();
-                    await formFile.CopyToAsync(memoryStream);
+                    if (formFile.Length > 0)
+                    {
+                        using var memoryStream = new MemoryStream();
+                        await formFile.CopyToAsync(memoryStream);
 
-                    var fileData = new FilePreviewModel
-                    {
-                        Name = formFile.FileName,
-                        ContentType = formFile.ContentType,
-                        Content = memoryStream.ToArray()
-                    };
+                        var fileData = new FilePreviewModel
+                        {
+                            Name = formFile.FileName,
+                            ContentType = formFile.ContentType,
+                            Content = memoryStream.ToArray()
+                        };
 
-                    // Classify as image or video based on MIME type
-                    if (fileData.ContentType.StartsWith("image"))
-                    {
-                        uploadedImages.Add(fileData);
-                    }
-                    else if (fileData.ContentType.StartsWith("video"))
-                    {
-                        uploadedVideos.Add(fileData);
+                        // Classify as image or video based on MIME type
+                        if (fileData.ContentType.StartsWith("image"))
+                        {
+                            uploadedImages.Add(fileData);
+                        }
+                        else if (fileData.ContentType.StartsWith("video"))
+                        {
+                            uploadedVideos.Add(fileData);
+                        }
                     }
                 }
-            }
 
-            // Match images and videos (you may need a custom matching logic based on naming convention, etc.)
-            var pairedFiles = new List<ImageVideoPair>();
-            foreach (var image in uploadedImages)
-            {
-                var matchingVideo = uploadedVideos.FirstOrDefault(video =>
-                    Path.GetFileNameWithoutExtension(video.Name) == Path.GetFileNameWithoutExtension(image.Name));
-
-                if (matchingVideo != null)
+                // Match images and videos (you may need a custom matching logic based on naming convention, etc.)
+                var pairedFiles = new List<ImageVideoPair>();
+                foreach (var image in uploadedImages)
                 {
-                    pairedFiles.Add(new ImageVideoPair
+                    var matchingVideo = uploadedVideos.FirstOrDefault(video =>
+                        Path.GetFileNameWithoutExtension(video.Name) == Path.GetFileNameWithoutExtension(image.Name));
+
+                    if (matchingVideo != null)
                     {
-                        Image = image,
-                        Video = matchingVideo
-                    });
+                        pairedFiles.Add(new ImageVideoPair
+                        {
+                            Image = image,
+                            Video = matchingVideo
+                        });
 
-                    // Remove paired video to avoid duplicate pairing
-                    uploadedVideos.Remove(matchingVideo);
+                        // Remove paired video to avoid duplicate pairing
+                        uploadedVideos.Remove(matchingVideo);
+                    }
                 }
-            }
 
-            // Save paired files to storage or database
-            foreach (var pair in pairedFiles)
+                // Save paired files to storage or database
+                foreach (var pair in pairedFiles)
+                {
+                    // Save image
+                    await SaveFileAsync(pair.Image, "images");
+
+                    // Save video
+                    await SaveFileAsync(pair.Video, "videos");
+                }
+
+                return Ok(new { Message = "Files uploaded successfully!", PairsUploaded = pairedFiles.Count });
+            }
+            catch (Exception ex)
             {
-                // Save image
-                await SaveFileAsync(pair.Image, "images");
-
-                // Save video
-                await SaveFileAsync(pair.Video, "videos");
+                return StatusCode(500, new { Error = ex.Message });
             }
-
-            return Ok(new { Message = "Files uploaded successfully!", PairsUploaded = pairedFiles.Count });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Error = ex.Message });
-        }
-    }*/
+        }*/
 
     [HttpPost("upload")]
     public async Task<IActionResult> UploadFile(IFormFile file)
@@ -136,7 +138,9 @@ public class FileUploadController : ControllerBase
 
         string base64Parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileUrl));
 
-        var qrCodeURL = $"{Request.Scheme}://{Request.Host}/download-page/{base64Parameter}";
+        var host = _config["AppSettings:Host"];
+
+        var qrCodeURL = $"{host}/download-page/{base64Parameter}";
         var image = _qr.GenerateQrCode(qrCodeURL);
       
         return Ok(new {QRCode = image, QRCodeURL = qrCodeURL});
