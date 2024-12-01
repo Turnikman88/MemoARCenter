@@ -51,14 +51,20 @@ body {
     border: 2px solid transparent;
 }
 
-    .file-upload-button:hover {
-        background-color: #D2042D; /* Lighter Burgundy */
-        transform: translateY(-2px);
-    }
+.file-upload-button:disabled {
+    background-color: #d15278;
+    cursor: not-allowed;
+}
+.file-upload-button:hover {
+    background-color: #D2042D; /* Lighter Burgundy */
+    transform: translateY(-2px);
+}
 
-    .file-upload-button:active {
-        transform: scale(0.98);
-    }
+.file-upload-button:active {
+    transform: scale(0.98);
+}
+
+
 
 /* Video Upload Button */
 .video-upload-button {
@@ -101,10 +107,15 @@ body {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-    .upload-button:hover {
-        background-color: #D2042D; /* Lighter Burgundy */
-        transform: translateY(-2px);
-    }
+.upload-button:hover {
+    background-color: #D2042D; /* Lighter Burgundy */
+    transform: translateY(-2px);
+}
+
+.upload-button:disabled {
+    background-color: #d15278;
+    cursor: not-allowed;
+}
 
 /* Status Message */
 .upload-status {

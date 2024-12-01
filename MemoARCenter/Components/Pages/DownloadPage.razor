@@ -4,9 +4,7 @@
     [Parameter]
     public string Base64Parameter { get; set; }
 
-    private string DecodedParameter => System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Base64Parameter));
-    private string MemoarUrl => $"memoar://getr?parameter={Uri.EscapeDataString(DecodedParameter)}";
-    private string DefaultUrl => DecodedParameter;
+    private string MemoarUrl => $"memoar://getr?parameter={Base64Parameter}";
 }
 
 <div class="home-container">
@@ -23,8 +21,6 @@
 
 <script>
     window.onload = function() {
-        const parameter = "@DefaultUrl";
-        const memoarUrl = `memoar://getr?parameter=${encodeURIComponent(parameter)}`;
-        window.location.href = memoarUrl;
+        window.location.href = "@Base64Parameter";
     };
 </script>

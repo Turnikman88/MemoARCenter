@@ -11,8 +11,8 @@
 <div class="file-upload-container">
 	<h3 class="header">Upload Images</h3>
 
-	<div class="file-input-area">
-		<InputFile accept="image/*" enctype="multipart/form-data" id="file-input" OnChange="HandleImageSelected" Multiple="true" maxFiles="20" class="file-input" />
+	<div class="file-input-area" >
+		<InputFile disabled="@(!IsElementEnabled)" accept="image/*" enctype="multipart/form-data" id="file-input" OnChange="HandleImageSelected" Multiple="true" maxFiles="20" class="file-input" />
 		<label for="file-input" class="file-upload-button">
 			Select Images
 		</label>
@@ -36,7 +36,7 @@
 						</button>
 						<InputFile id="@($"video-input-{image.Name}")" accept="video/*" class="file-input video-input hidden" OnChange="@((e) => HandleVideoSelected(e, image))" />
 
-						@if (!image.IsVideoLoaded)
+						@if (!image.IsVideoLoaded && !isIphone)
 						{
 							<p class="loading-message">Loading video...</p>
 						}
@@ -44,7 +44,7 @@
 						{
 							<div>
 								<video src="@image.AssociatedVideoUrl" class="preview-video" controls
-								@onloadeddata="() => MarkVideoAsLoaded(image)">
+									   @onloadeddata="() => MarkVideoAsLoaded(image)">
 								</video>
 
 							</div>
@@ -59,7 +59,7 @@
 		<p class="empty-preview">No images selected yet.</p>
 	}
 	<div class="button-area">
-		<button @onclick="UploadImagesAndVideos" class="upload-button">Upload</button>
+		<button @onclick="UploadImagesAndVideos" disabled="@(!IsElementEnabled)" class="upload-button">Upload</button>
 	</div>
 
 	@if (!string.IsNullOrEmpty(uploadStatus))
@@ -127,7 +127,7 @@
 	private string qrCodeImageData = string.Empty;
 	private string qrCodeURL = string.Empty;
 	private bool isIphone;
-
+	private bool IsElementEnabled = false;
 
 	private bool isImagesLoading;
 
@@ -216,6 +216,7 @@
 				type = videoFile.ContentType
 			});
 
+			image.VideoName = videoFile.Name;
 			image.AssociatedVideoUrl = videoUrl; // Store the object URL for video preview
 			image.IsVideoLoaded = false; // Set as not loaded until onloadeddata is triggered
 
@@ -257,7 +258,7 @@
 					{
 						// Add the image to the ZIP archive
 						var imageData = await JSRuntime.InvokeAsync<byte[]>("siteJs.getBlobData", image.DataUrl);
-						var imageExtension = Path.GetExtension(image.Name) ?? ".jpg";
+						var imageExtension = Path.GetExtension(image.Name) ?? ".jpeg";
 						var imageEntry = archive.CreateEntry($"{fileIndex}{imageExtension}", System.IO.Compression.CompressionLevel.Fastest);
 
 						using (var entryStream = imageEntry.Open())
@@ -267,7 +268,7 @@
 
 						// Add the video to the ZIP archive
 						var videoData = await JSRuntime.InvokeAsync<byte[]>("siteJs.getBlobData", image.AssociatedVideoUrl);
-						var videoExtension = ".mp4"; // Default extension
+						var videoExtension = Path.GetExtension(image.VideoName) ?? ".mp4"; // Default extension
 						var videoEntry = archive.CreateEntry($"{fileIndex}{videoExtension}", System.IO.Compression.CompressionLevel.Fastest);
 
 						using (var entryStream = videoEntry.Open())
@@ -298,10 +299,15 @@
 				zipContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/zip");
 				content.Add(zipContent, "file", "uploaded_files.zip");
 
+				IsElementEnabled = false;
+				StateHasChanged();
+
+				
 				// Send the POST request
 				var host = Configuration["Host"];
 				var url = $"{host}/api/fileupload/upload";
 				response = await httpClient.PostAsync(url, content);
+
 			}
 			catch (Exception ex)
 			{
@@ -309,6 +315,9 @@
 				Console.WriteLine($"HTTP upload failed: {ex.Message}");
 				return;
 			}
+
+			IsElementEnabled = true;
+			StateHasChanged();
 
 			// Check the response status
 			if (response.IsSuccessStatusCode)
@@ -369,17 +378,18 @@
 		if (firstRender)
 		{
 			isIphone = await JSRuntime.InvokeAsync<bool>("siteJs.isIphone");
-
+			IsElementEnabled = true;
+			StateHasChanged();
 			// Debugging or conditional logic based on the result
-			if (isIphone)
-			{
-				await JSRuntime.InvokeVoidAsync("alert", $"It is a hotdog.");
-			}
-			else
-			{
-				await JSRuntime.InvokeVoidAsync("alert", $"It is NOT a hotdog.");
+			// if (isIphone)
+			// {
+			// 	await JSRuntime.InvokeVoidAsync("alert", $"It is a hotdog.");
+			// }
+			// else
+			// {
+			// 	await JSRuntime.InvokeVoidAsync("alert", $"It is NOT a hotdog.");
 
-			}
+			// }
 			// Reset the file input using JS interop
 			await JSRuntime.InvokeVoidAsync("resetFileInput", "file-input");
 		}
@@ -442,6 +452,7 @@
 	private class FilePreviewModel
 	{
 		public string Name { get; set; }
+		public string VideoName { get; set; }
 		public string DataUrl { get; set; } // Object URL for the image
 		public string? AssociatedVideoUrl { get; set; } // Object URL for the associated video
 		public bool IsVideoLoaded { get; set; } // Tracks whether the video has finished loading

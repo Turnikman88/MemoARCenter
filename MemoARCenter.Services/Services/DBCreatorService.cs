@@ -91,10 +91,10 @@ namespace MemoARCenter.Services.Services
                 imageMetadataList.Add(new TargetFile
                 {
                     Name = fileInfo.Key,
-                    Extension = ".jpg"
+                    Extension = ".jpeg"
                 });
 
-                CreateEntry(fileInfo.Key, fileInfo.Value.ImageExtension, targetZip, imageInfo.ImageBytes);
+                CreateEntry(fileInfo.Key, ".jpeg", targetZip, imageInfo.ImageBytes);
                 return imageInfo;
             }
 
