@@ -17,11 +17,11 @@ namespace MemoARCenter.Services.Helpers
 
         public static IConversion ChangeBitRateAndFormat(this IConversion conversion, long bitRate)
         {
-            if (bitRate >= 2000000)
+            if (bitRate > 2000000)
             {
                 conversion.SetPreset(ConversionPreset.Medium)
                     .SetPixelFormat(PixelFormat.yuv420p)
-                    //                   .SetOutputFormat(Format.hevc)
+                    .SetOutputFormat(Format.h264)
                     .SetVideoBitrate(2000000);
             }
 
@@ -39,6 +39,17 @@ namespace MemoARCenter.Services.Helpers
             return conversion;
         }
 
-        
+        public static string EncodeToSafeBase64(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            // Convert to UTF-8 bytes
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+
+            // Convert to Base64 and replace invalid characters
+            string base64 = Convert.ToBase64String(bytes);
+            return base64.Replace("/", "_").Replace("+", "-").Replace("=", "");
+        }
     }
 }

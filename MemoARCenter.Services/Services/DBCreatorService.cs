@@ -102,7 +102,7 @@ namespace MemoARCenter.Services.Services
             {
                 var videoInfo = await _vs.ReduceVideoSizeAndBitrateAsync(fileInfo.Value.VideoFileCompletePath, 1000, imageInfo.Width, imageInfo.Height);
 
-                CreateEntry(fileInfo.Key, fileInfo.Value.VideoExtension, targetZip, videoInfo.VideoBytes);
+                CreateEntry(fileInfo.Key, ".mp4", targetZip, videoInfo.VideoBytes);
             }
         }
 
