@@ -35,6 +35,8 @@ namespace MemoARCenter
             });
 
             var config = builder.Configuration;
+            var pfxPassword = Environment.GetEnvironmentVariable("PFX_PASSWORD");
+
             builder.Services.Configure<AppSettings>(config.GetSection("AppSettings"));
 
             builder.WebHost.ConfigureKestrel(options =>
@@ -42,7 +44,7 @@ namespace MemoARCenter
                 options.ListenAnyIP(80); // HTTP
                 options.ListenAnyIP(443, listenOptions =>
                 {
-                    listenOptions.UseHttps("/etc/letsencrypt/live/memoar.art/certificate.pfx", "");
+                    listenOptions.UseHttps("/etc/letsencrypt/live/memoar.art/certificate.pfx", pfxPassword);
                 });
             });
 
