@@ -21,5 +21,13 @@ RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+
+# Copy the published application
 COPY --from=publish /app/publish .
+
+# Expose HTTP and HTTPS ports
+EXPOSE 80
+EXPOSE 443
+
+# Define the entry point
 ENTRYPOINT ["dotnet", "MemoARCenter.dll"]
