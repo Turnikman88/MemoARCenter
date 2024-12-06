@@ -4,12 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>0f815f67-b222-4209-ae2d-ddd0ab8a79f2</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MemoARCenter.Services\MemoARCenter.Services.csproj" />
     <ProjectReference Include="..\MemoARCenter.Client\MemoARCenter.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.9" />
   </ItemGroup>
 
