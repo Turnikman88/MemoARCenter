@@ -37,6 +37,14 @@ namespace MemoARCenter
             var config = builder.Configuration;
             builder.Services.Configure<AppSettings>(config.GetSection("AppSettings"));
 
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(80); // HTTP
+                options.ListenAnyIP(443, listenOptions =>
+                {
+                    listenOptions.UseHttps("/etc/letsencrypt/live/memoar.art/fullchain.pem", "/etc/letsencrypt/live/memoar.art/privkey.pem");
+                });
+            });
 
             var app = builder.Build();
 
