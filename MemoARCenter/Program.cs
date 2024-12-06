@@ -42,7 +42,7 @@ namespace MemoARCenter
                 options.ListenAnyIP(80); // HTTP
                 options.ListenAnyIP(443, listenOptions =>
                 {
-                    listenOptions.UseHttps("/etc/letsencrypt/live/memoar.art/certificate.pfx", "Rqwe4123");
+                    listenOptions.UseHttps("/etc/letsencrypt/live/memoar.art/certificate.pfx", "");
                 });
             });
 
