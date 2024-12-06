@@ -107,8 +107,14 @@ public class FileUploadController : ControllerBase
         }*/
 
     [HttpPost("upload")]
-    public async Task<IActionResult> UploadFile(IFormFile file)
+    public async Task<IActionResult> UploadFile([FromQuery] string albumName, IFormFile file)
     {
+        // Validate album name
+        if (string.IsNullOrEmpty(albumName))
+        {
+            return BadRequest("Album name is required.");
+        }
+
         if (file == null || file.Length == 0)
         {
             return BadRequest(new { Message = "File not provided or empty." });
@@ -136,11 +142,10 @@ public class FileUploadController : ControllerBase
 
         var fileUrl = $"{Request.Scheme}://{Request.Host}/api/fileupload/download/{guidFileName}";
 
-        string base64Parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileUrl));
-
+        var base64Parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileUrl));
         var host = _config["AppSettings:Host"];
 
-        var qrCodeURL = $"{host}/download-page/{base64Parameter}";
+        var qrCodeURL = $"{host}/download-page/{base64Parameter}/{albumName}";
         var image = _qr.GenerateQrCode(qrCodeURL);
       
         return Ok(new {QRCode = image, QRCodeURL = qrCodeURL});

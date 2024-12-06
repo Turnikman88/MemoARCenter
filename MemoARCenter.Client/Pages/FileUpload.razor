@@ -1,4 +1,5 @@
 ﻿@page "/file-upload"
+@using MemoARCenter.Services.Helpers
 @using MemoARCenter.Services.Models
 @using MemoARCenter.Models
 @using Microsoft.Extensions.Options
@@ -9,6 +10,12 @@
 
 
 <div class="file-upload-container">
+
+	<div class="album-name-container">
+		<label for="album-name" class="album-name-label">Select Album Name</label>
+		<input type="text" id="album-name" @bind="AlbumName" class="album-name-input" placeholder="Enter album name" />
+	</div>
+
 	<h3 class="header">Upload Images</h3>
 
 	<div class="file-input-area" >
@@ -121,6 +128,8 @@
 
 
 @code {
+	private string AlbumName { get; set; } = string.Empty;
+
 	private List<FilePreviewModel> uploadedImages = new();
 	private Dictionary<FilePreviewModel, FilePreviewModel?> imageToVideoMap = new();
 	private string? uploadStatus;
@@ -299,13 +308,15 @@
 				zipContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/zip");
 				content.Add(zipContent, "file", "uploaded_files.zip");
 
+
+
 				IsElementEnabled = false;
 				StateHasChanged();
 
 				
 				// Send the POST request
 				var host = Configuration["Host"];
-				var url = $"{host}/api/fileupload/upload";
+				var url = $"{host}/api/fileupload/upload?albumName={Helper.EncodeToBase64(AlbumName)}";
 				response = await httpClient.PostAsync(url, content);
 
 			}

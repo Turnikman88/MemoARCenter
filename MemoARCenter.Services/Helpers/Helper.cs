@@ -39,17 +39,17 @@ namespace MemoARCenter.Services.Helpers
             return conversion;
         }
 
-        public static string EncodeToSafeBase64(string input)
+        public static string EncodeToBase64(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            // Convert to UTF-8 bytes
             byte[] bytes = Encoding.UTF8.GetBytes(input);
 
             // Convert to Base64 and replace invalid characters
             string base64 = Convert.ToBase64String(bytes);
-            return base64.Replace("/", "_").Replace("+", "-").Replace("=", "");
+
+            return base64;
         }
     }
 }

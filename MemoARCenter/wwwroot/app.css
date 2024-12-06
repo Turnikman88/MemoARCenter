@@ -390,3 +390,36 @@ body {
         transform: translate(-20px, 30px) scale(1);
     }
 }
+
+.album-name-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.album-name-label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #EFECE9; /* Matches the text color */
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.album-name-input {
+    width: 100%;
+    max-width: 400px; /* Restrict input width for better aesthetics */
+    padding: 10px;
+    font-size: 14px;
+    color: #EFECE9; /* Light text */
+    background-color: #1a1a1a; /* Matches the input background to overall design */
+    border: 1px solid #AC9C8D; /* Taupe Border */
+    border-radius: 5px;
+    outline: none;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.3s ease;
+}
+
+.album-name-input:focus {
+    border-color: #D70040; /* Burgundy focus color */
+    box-shadow: 0 0 5px rgba(215, 0, 64, 0.5); /* Add subtle glow */
+}
