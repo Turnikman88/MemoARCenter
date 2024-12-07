@@ -1,8 +1,6 @@
 using MemoARCenter.Components;
 using MemoARCenter.Extensions;
 using MemoARCenter.Helpers.Models.System;
-using MemoARCenter.Services.Contracts;
-using MemoARCenter.Services.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
@@ -26,17 +24,21 @@ namespace MemoARCenter
 
             builder.Services.AddApplicationServices(builder.Configuration);
 
+            builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+            var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+
             ApplicationServiceExtensions.AddLetsEncrypt(builder);
 
             builder.Services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB (default is 30MB)
-                options.MemoryBufferThreshold = 100 * 1024 * 1024; // 100 MB
+                options.MultipartBodyLengthLimit = appSettings.MaxBytesAllowedTraffic;
+                options.MemoryBufferThreshold = appSettings.MaxBytesAllowedTraffic;
             });
 
             builder.Services.Configure<KestrelServerOptions>(options =>
             {
-                options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+                options.Limits.MaxRequestBodySize = appSettings.MaxBytesAllowedTraffic;
             });
 
             builder.Services.AddCors(options =>
@@ -48,11 +50,10 @@ namespace MemoARCenter
                           .AllowAnyMethod();
                 });
             });
-            
+
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseWebAssemblyDebugging();
@@ -60,7 +61,6 @@ namespace MemoARCenter
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
 
             app.UseHsts();

@@ -1,5 +1,4 @@
-﻿using MemoARCenter.Helpers.Models.System;
-using MemoARCenter.Services.Contracts;
+﻿using MemoARCenter.Services.Contracts;
 using MemoARCenter.Services.Services;
 using Serilog;
 
@@ -10,7 +9,6 @@ namespace MemoARCenter.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config = default)
         {
             CreateLogger();
-
 
             services.AddScoped<IDBCreator, DBCreatorService>();
             services.AddScoped<IImageEdit, ImageEditService>();
@@ -25,9 +23,6 @@ namespace MemoARCenter.Extensions
         {
             var pfxPassword = Environment.GetEnvironmentVariable("PFX_PASSWORD");
             var env = Environment.GetEnvironmentVariable("MEMOAR_ENV");
-
-            builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-
 
             if (env == "Prod")
             {

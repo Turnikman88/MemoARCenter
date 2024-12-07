@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MemoARCenter.Helpers.Models.System
+﻿namespace MemoARCenter.Helpers.Models.System
 {
     public class ResponseModel
     {
         public ResponseModel()
         {
-            
+
         }
 
         public ResponseModel(bool isOk, int statusCode, string message)

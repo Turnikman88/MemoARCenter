@@ -70,7 +70,7 @@ public class FileUploadController : ControllerBase
 
         return new ObjectResult(new { QRCode = image, QRCodeURL = qrCodeURL, Message = result.Message })
         {
-            StatusCode = result.StatusCode            
+            StatusCode = result.StatusCode
         };
     }
 

@@ -66,7 +66,7 @@ namespace MemoARCenter.Components.Pages
                 _log.LogDebug("Zip file upload started");
 
                 using var httpClient = new HttpClient();
-                httpClient.Timeout = TimeSpan.FromMinutes(10);
+                httpClient.Timeout = TimeSpan.FromMinutes(_settings.Value.HttpRequestTimeoutMinutes);
 
                 var content = new MultipartFormDataContent();
 
@@ -88,7 +88,7 @@ namespace MemoARCenter.Components.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    
+
                     if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
                     {
                         _qrCodeImageData = qrCodeElement.GetString();

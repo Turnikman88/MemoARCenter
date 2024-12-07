@@ -4,7 +4,6 @@ using MemoARCenter.Helpers.Models.DTOs;
 using MemoARCenter.Helpers.Models.System;
 using MemoARCenter.Services.Contracts;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -71,7 +70,7 @@ namespace MemoARCenter.Services.Services
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new ResponseModel(false, 422, e.Message);
             }
@@ -101,7 +100,7 @@ namespace MemoARCenter.Services.Services
             }
 
             ImageInfoDTO CreateImageEntry(ZipArchive targetZip, List<TargetFile> imageMetadataList, KeyValuePair<string, CustomFileInfoDTO> fileInfo)
-            {               
+            {
                 var imageInfo = _is.ResizeImage(fileInfo.Value.ImageFileCompletePath, 500, 500, 100);
 
                 imageMetadataList.Add(new TargetFile

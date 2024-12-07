@@ -87,7 +87,7 @@ namespace MemoARCenter.Client.Pages
                 return;
             }
 
-            using var stream = videoFile.OpenReadStream(maxAllowedSize: _maxAllowedVideoSize); // Max 50MB
+            using var stream = videoFile.OpenReadStream(maxAllowedSize: _maxAllowedVideoSize);
             using var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
             var fileData = memoryStream.ToArray();
@@ -157,7 +157,7 @@ namespace MemoARCenter.Client.Pages
                 try
                 {
                     using var httpClient = new HttpClient();
-                    httpClient.Timeout = TimeSpan.FromMinutes(10);
+                    httpClient.Timeout = TimeSpan.FromMinutes(int.Parse(Configuration["HttpRequestTimeoutMinutes"]));
 
                     using var content = new MultipartFormDataContent();
 
@@ -170,7 +170,7 @@ namespace MemoARCenter.Client.Pages
                     // Send the POST request
                     var url = $"{_host}/api/fileupload/upload?albumName={Helper.EncodeToBase64(AlbumName)}";
 
-                   
+
                     AlbumName = string.Empty;
                     _uploadedImages.Clear();
                     StateHasChanged();
