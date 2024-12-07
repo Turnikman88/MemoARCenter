@@ -17,7 +17,7 @@ namespace MemoARCenter.Helpers
             {
                 conversion.SetPreset(ConversionPreset.Medium)
                     .SetPixelFormat(PixelFormat.yuv420p)
-                    .SetOutputFormat(Format.hevc)
+                    .SetOutputFormat(Format.mp4)
                     .SetVideoBitrate(2000000);
             }
 
