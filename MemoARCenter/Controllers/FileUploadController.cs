@@ -1,14 +1,7 @@
-﻿using MemoARCenter.Services.Contracts;
-using MemoARCenter.Services.Models;
-using MemoARCenter.Services.Services;
-using Microsoft.AspNetCore.Http;
+﻿using MemoARCenter.Helpers.Models.System;
+using MemoARCenter.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Serilog.Core;
-using SkiaSharp;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Mime;
-using System.Reflection.Metadata;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 [ApiController]
@@ -18,24 +11,19 @@ public class FileUploadController : ControllerBase
     private readonly IDBCreator _dc;
     private readonly IWebHostEnvironment _env;
     private readonly IQRCode _qr;
-    private readonly IConfiguration _config;
+    private readonly AppSettings _settings;
     private readonly ILogger<FileUploadController> _log;
 
-    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr, IConfiguration config, ILogger<FileUploadController> log)
+    private string _host = string.Empty;
+
+    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr, IOptions<AppSettings> settings, ILogger<FileUploadController> log)
     {
         _dc = dbCreatorService;
         _env = env;
         _qr = qr;
-        _config = config;
+        _settings = settings.Value;
         _log = log;
-    }
-
-    [HttpGet]
-    public IActionResult Test()
-    {
-        Serilog.Log.Logger.Error("teeeeesr");
-        _log.LogInformation("are beeeeeeeeeeeeeeee");
-        return Ok();
+        SetConfig();
     }
 
     [HttpPost("upload")]
@@ -43,7 +31,6 @@ public class FileUploadController : ControllerBase
     {
         _log.LogInformation("Inside upload method");
 
-        // Validate album name
         if (string.IsNullOrEmpty(albumName))
         {
             return BadRequest("Album name is required.");
@@ -77,12 +64,11 @@ public class FileUploadController : ControllerBase
         var fileUrl = $"{Request.Scheme}://{Request.Host}/api/fileupload/download/{guidFileName}";
 
         var base64Parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileUrl));
-        var host = _config["AppSettings:Host"];
 
-        var qrCodeURL = $"{host}/download-page/{base64Parameter}/{albumName}";
+        var qrCodeURL = $"{_host}/download-page/{base64Parameter}/{albumName}";
         var image = _qr.GenerateQrCode(qrCodeURL);
-      
-        return Ok(new {QRCode = image, QRCodeURL = qrCodeURL});
+
+        return Ok(new { QRCode = image, QRCodeURL = qrCodeURL });
     }
 
     [HttpGet("download/{fileName}")]
@@ -108,16 +94,14 @@ public class FileUploadController : ControllerBase
         var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
         if (!provider.TryGetContentType(filePath, out var contentType))
         {
-            contentType = "application/octet-stream"; 
+            contentType = "application/octet-stream";
         }
         return contentType;
     }
 
-    private async Task SaveFileAsync(FilePreviewModel file, string folder)
+    private void SetConfig()
     {
-        var path = Path.Combine("wwwroot", folder, file.Name);
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-
-        await System.IO.File.WriteAllBytesAsync(path, file.Content);
+        _host = _settings.Host;
     }
+
 }

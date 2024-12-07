@@ -1,23 +1,34 @@
-﻿using MemoARCenter.Services.Contracts;
-using MemoARCenter.Services.Models;
+﻿using MemoARCenter.Helpers.Models.DTOs;
+using MemoARCenter.Helpers.Models.System;
+using MemoARCenter.Services.Contracts;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MemoARCenter.Services.Services
 {
     public class ImageEditService : IImageEdit
     {
-        private const int _targetSizeInBytes = 100 * 1024;
+        private readonly AppSettings _settings;
+        private readonly ILogger<ImageEditService> _log;
+
+        private int _targetSizeInBytes = 50 * 1024;
         private int _quality = 90;
-        public static readonly List<string> ValidImageExtensions = new List<string>(){ ".jpg", ".jpeg", ".png", ".bmp", ".gif" };
+
+        public static List<string> ValidImageExtensions = new List<string>();
+
+        public ImageEditService(IOptions<AppSettings> settings, ILogger<ImageEditService> log)
+        {
+            _settings = settings.Value;
+            _log = log;
+
+            SetConfigs();
+        }
 
         public ImageInfoDTO ResizeImage(string imagePath, int maxWidth, int maxHeight, int maxSizeKB)
         {
+            _log.LogDebug("Start resizing image");
+
             using var originalBitmap = SKBitmap.Decode(imagePath);
 
             int width, height;
@@ -33,18 +44,23 @@ namespace MemoARCenter.Services.Services
 
             while (outputStream.Length > _targetSizeInBytes)
             {
-                if (_quality <= 15) 
+                if (_quality <= 15)
                 {
+                    _log.LogDebug("Quality is less than 15 - stopping");
+
                     break;
                 }
 
-                outputStream.SetLength(0); 
+                outputStream.SetLength(0);
                 resizedImage.Encode(SKEncodedImageFormat.Jpeg, _quality).SaveTo(outputStream);
 
-                _quality -= 5; 
+                _quality -= 5;
+                _log.LogDebug($"Quality is down to {_quality}");
             }
 
-            var result = new ImageInfoDTO(outputStream.ToArray(), width, height); 
+            var result = new ImageInfoDTO(outputStream.ToArray(), width, height);
+
+            _log.LogDebug("Image generation finished");
 
             return result;
 
@@ -66,6 +82,13 @@ namespace MemoARCenter.Services.Services
         {
             string extension = Path.GetExtension(filePath).ToLowerInvariant();
             return ValidImageExtensions.Contains(extension);
+        }
+
+        private void SetConfigs()
+        {
+            ValidImageExtensions = _settings.Image.ValidImageExtensions;
+            _targetSizeInBytes = _settings.Image.TargetSizeBytes;
+            _quality = _settings.Image.ImageQuality;
         }
     }
 }

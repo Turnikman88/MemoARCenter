@@ -1,9 +1,4 @@
-﻿using MemoARCenter.Services.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MemoARCenter.Helpers.Models.DTOs;
 
 namespace MemoARCenter.Services.Contracts
 {

@@ -4,6 +4,7 @@ WORKDIR /src
 # Copy project files
 COPY ["MemoARCenter/MemoARCenter.csproj", "MemoARCenter/"]
 COPY ["MemoARCenter.Services/MemoARCenter.Services.csproj", "MemoARCenter.Services/"]
+COPY ["MemoARCenter.Services/MemoARCenter.Helpers.csproj", "MemoARCenter.Helpers/"]
 COPY ["MemoARCenter.Client/MemoARCenter.Client.csproj", "MemoARCenter.Client/"]
 
 # Restore dependencies

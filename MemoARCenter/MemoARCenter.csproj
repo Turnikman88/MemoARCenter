@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MemoARCenter.Helpers\MemoARCenter.Helpers.csproj" />
     <ProjectReference Include="..\MemoARCenter.Services\MemoARCenter.Services.csproj" />
     <ProjectReference Include="..\MemoARCenter.Client\MemoARCenter.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />

@@ -1,17 +1,10 @@
-﻿using MemoARCenter.Services.Contracts;
-using MemoARCenter.Services.Helpers;
-using MemoARCenter.Services.Models;
-using Serilog;
-using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using MemoARCenter.Helpers;
+using MemoARCenter.Helpers.Models;
+using MemoARCenter.Helpers.Models.DTOs;
+using MemoARCenter.Services.Contracts;
+using Microsoft.Extensions.Logging;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Xabe.FFmpeg;
 
 namespace MemoARCenter.Services.Services
 {
@@ -19,18 +12,20 @@ namespace MemoARCenter.Services.Services
     {
         private readonly IImageEdit _is;
         private readonly IVideoEdit _vs;
-        public DBCreatorService(IImageEdit iss, IVideoEdit vs)
+        private readonly ILogger<DBCreatorService> _log;
+        public DBCreatorService(IImageEdit iss, IVideoEdit vs, ILogger<DBCreatorService> log)
         {
             _is = iss;
             _vs = vs;
+            _log = log;
         }
-
 
         public async Task ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath)
         {
-            Log.Logger.Information("Inside ProcessZipAndResizeImages");
+            _log.LogDebug("Inside ProcessZipAndResizeImages");
 
             string tempExtractFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
             try
             {
                 Directory.CreateDirectory(tempExtractFolder);
@@ -46,9 +41,13 @@ namespace MemoARCenter.Services.Services
 
                     foreach (var fileInfo in dict)
                     {
+                        _log.LogDebug($"Creating target for {fileInfo.Key}");
+
                         ImageInfoDTO imageInfo = CreateImageEntry(targetZip, imageMetadataList, fileInfo);
                         await CreateVideoEntry(targetZip, fileInfo, imageInfo);
                     }
+
+                    _log.LogDebug("Creating targets.json");
 
                     var jsonContent = JsonSerializer.Serialize(imageMetadataList, new JsonSerializerOptions { WriteIndented = true });
 
@@ -60,12 +59,10 @@ namespace MemoARCenter.Services.Services
                     }
                 }
             }
-            catch (Exception e)
-            {
-
-            }
             finally
             {
+                _log.LogDebug("Clear files");
+
                 if (Directory.Exists(tempExtractFolder))
                 {
                     Directory.Delete(tempExtractFolder, true);
@@ -107,9 +104,10 @@ namespace MemoARCenter.Services.Services
             }
         }
 
-        //ToDo: may need optimization and error handling
         private Dictionary<string, CustomFileInfoDTO> CreateCustomFileInfoModel(string[] paths)
         {
+            _log.LogDebug("Creating custom file info model");
+
             var dirPath = Path.GetDirectoryName(paths.First());
 
             var dict = new Dictionary<string, CustomFileInfoDTO>();
@@ -129,10 +127,10 @@ namespace MemoARCenter.Services.Services
                 else
                 {
                     customFileInfoDTO = new CustomFileInfoDTO(dirPath, fileNameNoExt);
-                    SetExtensions(path);    
+                    SetExtensions(path);
                     dict.Add(fileNameNoExt, customFileInfoDTO);
                 }
-                    
+
             }
 
             return dict;
