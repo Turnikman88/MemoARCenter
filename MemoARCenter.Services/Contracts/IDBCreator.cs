@@ -1,7 +1,9 @@
-﻿namespace MemoARCenter.Services.Contracts
+﻿using MemoARCenter.Helpers.Models.System;
+
+namespace MemoARCenter.Services.Contracts
 {
     public interface IDBCreator
     {
-        Task ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath);
+        Task<ResponseModel> ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath);
     }
 }

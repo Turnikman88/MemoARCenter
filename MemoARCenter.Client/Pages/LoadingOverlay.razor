@@ -1,0 +1,10 @@
+﻿@if (IsVisible)
+{
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+        @if (!string.IsNullOrEmpty(LoadingMessage))
+        {
+            <p>@LoadingMessage</p>
+        }
+    </div>
+}

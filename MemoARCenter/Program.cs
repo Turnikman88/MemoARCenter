@@ -3,6 +3,8 @@ using MemoARCenter.Extensions;
 using MemoARCenter.Helpers.Models.System;
 using MemoARCenter.Services.Contracts;
 using MemoARCenter.Services.Services;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
 namespace MemoARCenter
 {
@@ -26,6 +28,16 @@ namespace MemoARCenter
 
             ApplicationServiceExtensions.AddLetsEncrypt(builder);
 
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB (default is 30MB)
+                options.MemoryBufferThreshold = 100 * 1024 * 1024; // 100 MB
+            });
+
+            builder.Services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+            });
 
             builder.Services.AddCors(options =>
             {

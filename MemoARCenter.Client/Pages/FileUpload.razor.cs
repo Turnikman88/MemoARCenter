@@ -10,17 +10,19 @@ namespace MemoARCenter.Client.Pages
     {
         private string AlbumName { get; set; } = string.Empty;
 
+        private LoadingOverlay? _loadingOverlay;
+        private SmallLoadingSpinner? _loadingSpinner;
         private List<FilePreviewModel> _uploadedImages = new();
-        private Dictionary<FilePreviewModel, FilePreviewModel?> _imageToVideoMap = new();
         private string? _uploadStatus;
         private string _qrCodeImageData = string.Empty;
         private string _qrCodeURL = string.Empty;
         private bool _isIphone;
-        private bool _IsElementEnabled = false;
+        private bool _IsElementEnabled => (!string.IsNullOrEmpty(AlbumName) && _uploadedImages.Any(x => !string.IsNullOrEmpty(x.AssociatedVideoUrl)));
         private bool _isImagesLoading;
         private string _host = string.Empty;
         private int _maxAllowedVideoSize;
         private int _maxAllowedImageSize;
+
 
         [Inject]
         public IConfiguration Configuration { get; set; }
@@ -155,6 +157,8 @@ namespace MemoARCenter.Client.Pages
                 try
                 {
                     using var httpClient = new HttpClient();
+                    httpClient.Timeout = TimeSpan.FromMinutes(10);
+
                     using var content = new MultipartFormDataContent();
 
                     // Add the ZIP file to the form
@@ -162,30 +166,33 @@ namespace MemoARCenter.Client.Pages
                     zipContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/zip");
                     content.Add(zipContent, "file", "uploaded_files.zip");
 
-                    _IsElementEnabled = false;
-                    StateHasChanged();
 
                     // Send the POST request
                     var url = $"{_host}/api/fileupload/upload?albumName={Helper.EncodeToBase64(AlbumName)}";
+
+                   
+                    AlbumName = string.Empty;
+                    _uploadedImages.Clear();
+                    StateHasChanged();
+                    _loadingSpinner.Show();
                     response = await httpClient.PostAsync(url, content);
 
                 }
                 catch (Exception ex)
                 {
+                    _loadingSpinner.Hide();
                     _uploadStatus = "Network error while uploading.";
-                    Console.WriteLine($"HTTP upload failed: {ex.Message}");
                     return;
                 }
 
-                _IsElementEnabled = true;
-                StateHasChanged();
+                _loadingSpinner.Hide();
+
+                var responseContent = await response?.Content?.ReadAsStringAsync() ?? string.Empty;
+
+                var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-
-                    var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
-
                     if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
                     {
                         _qrCodeImageData = qrCodeElement.GetString();
@@ -208,7 +215,14 @@ namespace MemoARCenter.Client.Pages
                 }
                 else
                 {
-                    _uploadStatus = $"Upload failed. Status Code: {response.StatusCode}";
+                    if (responseObject.RootElement.TryGetProperty("message", out var message))
+                    {
+                        _uploadStatus = message.GetString();
+                    }
+                    else
+                    {
+                        _uploadStatus = $"Upload failed. Status Code: {response.StatusCode}";
+                    }
                 }
             }
             catch (Exception ex)
@@ -241,9 +255,8 @@ namespace MemoARCenter.Client.Pages
                 SetConfig();
 
                 _isIphone = await JSRuntime.InvokeAsync<bool>("siteJs.isIphone");
-                _IsElementEnabled = true;
+                _loadingOverlay?.Hide();
                 StateHasChanged();
-
                 await JSRuntime.InvokeVoidAsync("resetFileInput", "file-input");
             }
         }

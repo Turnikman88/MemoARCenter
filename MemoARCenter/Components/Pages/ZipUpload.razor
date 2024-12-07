@@ -1,7 +1,9 @@
 ﻿@page "/upload-zip"
 @rendermode InteractiveServer
+@using MemoARCenter.Client.Pages
 @using Microsoft.AspNetCore.Components.Forms
 
+<LoadingOverlay @ref="_loadingOverlay" IsVisible="true" LoadingMessage="" />
 
 <div class="file-upload-container">
     <h3 class="header">Upload Archive</h3>
@@ -21,6 +23,8 @@
     </div>
 
     <p class="upload-status">@_statusMessage</p>
+
+    <SmallLoadingSpinner @ref="_loadingSpinner" />
 
     @if (!string.IsNullOrEmpty(_qrCodeImageData))
     {

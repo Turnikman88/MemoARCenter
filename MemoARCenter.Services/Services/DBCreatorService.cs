@@ -1,8 +1,10 @@
 ﻿using MemoARCenter.Helpers;
 using MemoARCenter.Helpers.Models;
 using MemoARCenter.Helpers.Models.DTOs;
+using MemoARCenter.Helpers.Models.System;
 using MemoARCenter.Services.Contracts;
 using Microsoft.Extensions.Logging;
+using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -20,7 +22,7 @@ namespace MemoARCenter.Services.Services
             _log = log;
         }
 
-        public async Task ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath)
+        public async Task<ResponseModel> ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath)
         {
             _log.LogDebug("Inside ProcessZipAndResizeImages");
 
@@ -39,9 +41,19 @@ namespace MemoARCenter.Services.Services
 
                     var dict = CreateCustomFileInfoModel(Directory.GetFiles(tempExtractFolder));
 
+                    if (dict == null)
+                    {
+                        return new ResponseModel(false, 422, "The zip contains invalid files. Use only images and videos");
+                    }
+
                     foreach (var fileInfo in dict)
                     {
                         _log.LogDebug($"Creating target for {fileInfo.Key}");
+                        if (string.IsNullOrEmpty(fileInfo.Value.ImageExtension) ||
+                            string.IsNullOrEmpty(fileInfo.Value.VideoExtension))
+                        {
+                            continue;
+                        }
 
                         ImageInfoDTO imageInfo = CreateImageEntry(targetZip, imageMetadataList, fileInfo);
                         await CreateVideoEntry(targetZip, fileInfo, imageInfo);
@@ -59,6 +71,10 @@ namespace MemoARCenter.Services.Services
                     }
                 }
             }
+            catch(Exception e)
+            {
+                return new ResponseModel(false, 422, e.Message);
+            }
             finally
             {
                 _log.LogDebug("Clear files");
@@ -69,6 +85,8 @@ namespace MemoARCenter.Services.Services
                 }
                 File.Delete(sourceZipPath);
             }
+
+            return new ResponseModel(true, 200, "OK");
 
             void CreateEntry(string fileName, string ext, ZipArchive targetZip, byte[] byteArr)
             {
@@ -83,7 +101,7 @@ namespace MemoARCenter.Services.Services
             }
 
             ImageInfoDTO CreateImageEntry(ZipArchive targetZip, List<TargetFile> imageMetadataList, KeyValuePair<string, CustomFileInfoDTO> fileInfo)
-            {
+            {               
                 var imageInfo = _is.ResizeImage(fileInfo.Value.ImageFileCompletePath, 500, 500, 100);
 
                 imageMetadataList.Add(new TargetFile
@@ -115,9 +133,17 @@ namespace MemoARCenter.Services.Services
             var fileNameNoExt = string.Empty;
 
             var customFileInfoDTO = new CustomFileInfoDTO();
+            var ext = string.Empty;
 
             foreach (var path in paths)
             {
+                ext = Path.GetExtension(path);
+                if (Helper.GetValidExtension(ext, ImageEditService.ValidImageExtensions) == null
+                    && Helper.GetValidExtension(ext, VideoEditService.ValidVideoExtensions) == null)
+                {
+                    return default;
+                }
+
                 fileNameNoExt = Path.GetFileNameWithoutExtension(path);
 
                 if (dict.TryGetValue(fileNameNoExt, out customFileInfoDTO))

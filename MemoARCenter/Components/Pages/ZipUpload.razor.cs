@@ -1,4 +1,5 @@
-﻿using MemoARCenter.Helpers;
+﻿using MemoARCenter.Client.Pages;
+using MemoARCenter.Helpers;
 using MemoARCenter.Helpers.Models.System;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -15,6 +16,8 @@ namespace MemoARCenter.Components.Pages
         private IOptions<AppSettings> _settings { get; set; }
 
         private string AlbumName { get; set; } = string.Empty;
+        private LoadingOverlay? _loadingOverlay;
+        private SmallLoadingSpinner? _loadingSpinner;
 
         private IBrowserFile? _selectedFile;
         private string _statusMessage = "No file selected.";
@@ -59,9 +62,12 @@ namespace MemoARCenter.Components.Pages
 
             try
             {
+                _loadingSpinner.Show();
                 _log.LogDebug("Zip file upload started");
 
                 using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromMinutes(10);
+
                 var content = new MultipartFormDataContent();
 
                 var fileStream = _selectedFile.OpenReadStream(_maxZipFileSize);
@@ -74,11 +80,15 @@ namespace MemoARCenter.Components.Pages
                 ClearSelection();
                 var response = await httpClient.PostAsync(url, content);
 
+                var responseContent = await response?.Content?.ReadAsStringAsync() ?? string.Empty;
+
+                var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
+
+                _loadingSpinner.Hide();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-
-                    var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
+                    
                     if (responseObject.RootElement.TryGetProperty("qrCode", out var qrCodeElement))
                     {
                         _qrCodeImageData = qrCodeElement.GetString();
@@ -101,11 +111,20 @@ namespace MemoARCenter.Components.Pages
                 }
                 else
                 {
-                    _statusMessage = $"Failed to upload file. Status code: {response.StatusCode}";
+                    if (responseObject.RootElement.TryGetProperty("message", out var message))
+                    {
+                        _statusMessage = message.GetString();
+                    }
+                    else
+                    {
+                        _statusMessage = $"Failed to upload file. Status code: {response.StatusCode}";
+                    }
                 }
             }
             catch (Exception ex)
             {
+                _loadingSpinner.Hide();
+
                 _statusMessage = $"Error uploading file: {ex.Message}";
             }
         }
@@ -129,6 +148,7 @@ namespace MemoARCenter.Components.Pages
             if (firstRender)
             {
                 SetConfigs();
+                _loadingOverlay?.Hide();
                 StateHasChanged();
             }
         }

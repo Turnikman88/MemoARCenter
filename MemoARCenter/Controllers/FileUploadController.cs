@@ -58,7 +58,7 @@ public class FileUploadController : ControllerBase
         var guidFileName = $"{Guid.NewGuid().ToString()}_DB.zip";
 
         var targetPath = Path.Combine(uploadPath, guidFileName);
-        await _dc.ProcessZipAndResizeImages(filePath, targetPath);
+        var result = await _dc.ProcessZipAndResizeImages(filePath, targetPath);
 
 
         var fileUrl = $"{Request.Scheme}://{Request.Host}/api/fileupload/download/{guidFileName}";
@@ -68,7 +68,10 @@ public class FileUploadController : ControllerBase
         var qrCodeURL = $"{_host}/download-page/{base64Parameter}/{albumName}";
         var image = _qr.GenerateQrCode(qrCodeURL);
 
-        return Ok(new { QRCode = image, QRCodeURL = qrCodeURL });
+        return new ObjectResult(new { QRCode = image, QRCodeURL = qrCodeURL, Message = result.Message })
+        {
+            StatusCode = result.StatusCode            
+        };
     }
 
     [HttpGet("download/{fileName}")]
