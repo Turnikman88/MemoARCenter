@@ -39,6 +39,8 @@ namespace MemoARCenter.Services.Services
 
             var videoStream = mediaInfo.VideoStreams.First();
 
+            videoStream.SetCodec(VideoCodec.hevc);
+
             _log.LogDebug("Adding video stream");
 
             conversion.AddStream(videoStream);
