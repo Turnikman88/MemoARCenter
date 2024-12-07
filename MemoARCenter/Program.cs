@@ -3,6 +3,7 @@ using MemoARCenter.Components;
 using MemoARCenter.Models;
 using MemoARCenter.Services.Contracts;
 using MemoARCenter.Services.Services;
+using Serilog;
 namespace MemoARCenter
 {
     public class Program
@@ -10,6 +11,17 @@ namespace MemoARCenter
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning) 
+                .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Debug()
+
+                // .MinimumLevel.Override("Default", Serilog.Events.LogEventLevel.Warning)
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -23,14 +35,16 @@ namespace MemoARCenter
             builder.Services.AddScoped<IImageEdit,ImageEditService>();
             builder.Services.AddScoped<IVideoEdit,VideoEditService>();
             builder.Services.AddScoped<IQRCode, QRCodeService>();
+            builder.Services.AddLogging();
+
 
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.AllowAnyOrigin()  // Allow requests from any origin
-                          .AllowAnyHeader()  // Allow any headers
-                          .AllowAnyMethod(); // Allow any HTTP method (GET, POST, PUT, DELETE, etc.)
+                    policy.AllowAnyOrigin()  
+                          .AllowAnyHeader()  
+                          .AllowAnyMethod(); 
                 });
             });
 
@@ -38,6 +52,7 @@ namespace MemoARCenter
             var pfxPassword = Environment.GetEnvironmentVariable("PFX_PASSWORD");
 
             builder.Services.Configure<AppSettings>(config.GetSection("AppSettings"));
+
 
             builder.WebHost.ConfigureKestrel(options =>
             {
@@ -50,7 +65,7 @@ namespace MemoARCenter
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+                       // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseWebAssemblyDebugging();

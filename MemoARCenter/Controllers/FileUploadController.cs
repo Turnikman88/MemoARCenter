@@ -3,6 +3,7 @@ using MemoARCenter.Services.Models;
 using MemoARCenter.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Core;
 using SkiaSharp;
 using System.IO;
 using System.IO.Compression;
@@ -18,97 +19,30 @@ public class FileUploadController : ControllerBase
     private readonly IWebHostEnvironment _env;
     private readonly IQRCode _qr;
     private readonly IConfiguration _config;
+    private readonly ILogger<FileUploadController> _log;
 
-
-    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr, IConfiguration config)
+    public FileUploadController(IDBCreator dbCreatorService, IWebHostEnvironment env, IQRCode qr, IConfiguration config, ILogger<FileUploadController> log)
     {
         _dc = dbCreatorService;
         _env = env;
         _qr = qr;
         _config = config;
+        _log = log;
     }
-    /*
-        [HttpPost("bulkupload")]
-        public async Task<IActionResult> UploadFiles()
-        {
-            if (!Request.HasFormContentType)
-            {
-                return BadRequest("Unsupported content type.");
-            }
 
-            var form = Request.Form;
-            var uploadedImages = new List<FilePreviewModel>();
-            var uploadedVideos = new List<FilePreviewModel>();
-
-            try
-            {
-                foreach (var formFile in form.Files)
-                {
-                    if (formFile.Length > 0)
-                    {
-                        using var memoryStream = new MemoryStream();
-                        await formFile.CopyToAsync(memoryStream);
-
-                        var fileData = new FilePreviewModel
-                        {
-                            Name = formFile.FileName,
-                            ContentType = formFile.ContentType,
-                            Content = memoryStream.ToArray()
-                        };
-
-                        // Classify as image or video based on MIME type
-                        if (fileData.ContentType.StartsWith("image"))
-                        {
-                            uploadedImages.Add(fileData);
-                        }
-                        else if (fileData.ContentType.StartsWith("video"))
-                        {
-                            uploadedVideos.Add(fileData);
-                        }
-                    }
-                }
-
-                // Match images and videos (you may need a custom matching logic based on naming convention, etc.)
-                var pairedFiles = new List<ImageVideoPair>();
-                foreach (var image in uploadedImages)
-                {
-                    var matchingVideo = uploadedVideos.FirstOrDefault(video =>
-                        Path.GetFileNameWithoutExtension(video.Name) == Path.GetFileNameWithoutExtension(image.Name));
-
-                    if (matchingVideo != null)
-                    {
-                        pairedFiles.Add(new ImageVideoPair
-                        {
-                            Image = image,
-                            Video = matchingVideo
-                        });
-
-                        // Remove paired video to avoid duplicate pairing
-                        uploadedVideos.Remove(matchingVideo);
-                    }
-                }
-
-                // Save paired files to storage or database
-                foreach (var pair in pairedFiles)
-                {
-                    // Save image
-                    await SaveFileAsync(pair.Image, "images");
-
-                    // Save video
-                    await SaveFileAsync(pair.Video, "videos");
-                }
-
-                return Ok(new { Message = "Files uploaded successfully!", PairsUploaded = pairedFiles.Count });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Error = ex.Message });
-            }
-        }*/
+    [HttpGet]
+    public IActionResult Test()
+    {
+        Serilog.Log.Logger.Error("teeeeesr");
+        _log.LogInformation("are beeeeeeeeeeeeeeee");
+        return Ok();
+    }
 
     [HttpPost("upload")]
     public async Task<IActionResult> UploadFile([FromQuery] string albumName, IFormFile file)
     {
+        _log.LogInformation("Inside upload method");
+
         // Validate album name
         if (string.IsNullOrEmpty(albumName))
         {
@@ -154,6 +88,8 @@ public class FileUploadController : ControllerBase
     [HttpGet("download/{fileName}")]
     public IActionResult DownloadFile(string fileName)
     {
+        _log.LogInformation("Inside download method");
+
         var filePath = Path.Combine(_env.ContentRootPath, "UploadedFiles", fileName);
 
         if (!System.IO.File.Exists(filePath))
@@ -184,13 +120,4 @@ public class FileUploadController : ControllerBase
 
         await System.IO.File.WriteAllBytesAsync(path, file.Content);
     }
-
-    [HttpGet("test")]
-    public IActionResult Test()
-    {
-        //_dc.Test();
-
-        return Ok();
-    }
-
 }

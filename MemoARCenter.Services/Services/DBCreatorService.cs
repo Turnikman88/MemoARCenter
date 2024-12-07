@@ -1,6 +1,7 @@
 ﻿using MemoARCenter.Services.Contracts;
 using MemoARCenter.Services.Helpers;
 using MemoARCenter.Services.Models;
+using Serilog;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,6 @@ namespace MemoARCenter.Services.Services
     {
         private readonly IImageEdit _is;
         private readonly IVideoEdit _vs;
-
         public DBCreatorService(IImageEdit iss, IVideoEdit vs)
         {
             _is = iss;
@@ -28,8 +28,10 @@ namespace MemoARCenter.Services.Services
 
         public async Task ProcessZipAndResizeImages(string sourceZipPath, string targetZipPath)
         {
-            string tempExtractFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Log.Logger.Information("Inside ProcessZipAndResizeImages");
 
+            string tempExtractFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            throw new Exception("ooops");
             try
             {
                 Directory.CreateDirectory(tempExtractFolder);
