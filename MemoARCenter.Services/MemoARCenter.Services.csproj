@@ -10,7 +10,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.9" />
     <PackageReference Include="SkiaSharp.QrCode" Version="0.7.0" />
-	<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" />
+	<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.1" />
 	<PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
   </ItemGroup>
 
