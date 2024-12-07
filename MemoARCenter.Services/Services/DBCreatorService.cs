@@ -31,7 +31,6 @@ namespace MemoARCenter.Services.Services
             Log.Logger.Information("Inside ProcessZipAndResizeImages");
 
             string tempExtractFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            throw new Exception("ooops");
             try
             {
                 Directory.CreateDirectory(tempExtractFolder);
