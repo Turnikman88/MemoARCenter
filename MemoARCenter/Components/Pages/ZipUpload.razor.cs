@@ -53,6 +53,7 @@ namespace MemoARCenter.Components.Pages
 
         private async Task UploadFile()
         {
+            _qrCodeImageData = string.Empty;
 
             if (_selectedFile == null)
             {

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@rendermode InteractiveWebAssembly
 
 <PageTitle>Home</PageTitle>
 
@@ -12,4 +13,8 @@
     </p>
 
     <p class="app-tagline">Make your memories unforgettable with <span class="app-name">MemoAR</span>!</p>
+
+    <div class="button-area">
+        <button @onclick="NavigateToUpload" class="upload-button">Go to Upload Page</button>
+    </div>
 </div>

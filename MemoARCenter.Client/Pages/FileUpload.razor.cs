@@ -105,6 +105,7 @@ namespace MemoARCenter.Client.Pages
 
         private async Task UploadImagesAndVideos()
         {
+            _qrCodeImageData = string.Empty;
             if (_uploadedImages.Count == 0)
             {
                 _uploadStatus = "No images selected.";
