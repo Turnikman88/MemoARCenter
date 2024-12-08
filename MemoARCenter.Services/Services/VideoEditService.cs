@@ -45,7 +45,7 @@ namespace MemoARCenter.Services.Services
 
             conversion.AddStream(videoStream);
 
-            CalculatePadding(targetWidth, targetHeight, conversion, videoStream);
+            // CalculatePadding(targetWidth, targetHeight, conversion, videoStream);
 
             conversion.ChangeBitRateAndFormat(videoStream.Bitrate) //ToDo: add logic here
                 .AddAudioStream(mediaInfo);

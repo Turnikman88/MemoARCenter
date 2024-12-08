@@ -13,12 +13,12 @@ namespace MemoARCenter.Helpers
 
         public static IConversion ChangeBitRateAndFormat(this IConversion conversion, long bitRate)
         {
-            if (bitRate > 2000000)
+            if (bitRate > 1500000)
             {
                 conversion.SetPreset(ConversionPreset.Medium)
                     .SetPixelFormat(PixelFormat.yuv420p)
                     .SetOutputFormat(Format.mp4)
-                    .SetVideoBitrate(2000000);
+                    .SetVideoBitrate(1500000);
             }
 
             return conversion;
