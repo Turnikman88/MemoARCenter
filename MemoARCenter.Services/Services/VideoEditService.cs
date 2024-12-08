@@ -29,32 +29,9 @@ namespace MemoARCenter.Services.Services
             var outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()
                  + Path.GetExtension(inputPath));
 
-            var conversion = FFmpeg.Conversions.New()
-                .SetOutput(outputPath)
-                .SetOverwriteOutput(true);
+            // await FFMpegEdit(inputPath, outputPath);
 
-            _log.LogDebug("Getting media info");
-
-            var mediaInfo = await FFmpeg.GetMediaInfo(inputPath);
-
-            var videoStream = mediaInfo.VideoStreams.First();
-
-            videoStream.SetCodec(VideoCodec.hevc);
-
-            _log.LogDebug("Adding video stream");
-
-            conversion.AddStream(videoStream);
-
-            // CalculatePadding(targetWidth, targetHeight, conversion, videoStream);
-
-            conversion.ChangeBitRateAndFormat(videoStream.Bitrate) //ToDo: add logic here
-                .AddAudioStream(mediaInfo);
-
-            _log.LogDebug("Start video resizing");
-
-            await conversion.Start();
-
-            _log.LogDebug("Video resizing finished");
+            _log.LogDebug("Start reading bytes");
 
             var videoBytes = await File.ReadAllBytesAsync(outputPath);
 
@@ -100,6 +77,36 @@ namespace MemoARCenter.Services.Services
 
                 conversion.AddParameter($"-vf pad={padWidth}:{padHeight}:{padX}:{padY}:black");
             }
+        }
+
+        private async Task FFMpegEdit(string inputPath, string outputPath)
+        {
+            var conversion = FFmpeg.Conversions.New()
+                .SetOutput(outputPath)
+                .SetOverwriteOutput(true);
+
+            _log.LogDebug("Getting media info");
+
+            var mediaInfo = await FFmpeg.GetMediaInfo(inputPath);
+
+            var videoStream = mediaInfo.VideoStreams.First();
+
+            videoStream.SetCodec(VideoCodec.hevc);
+
+            _log.LogDebug("Adding video stream");
+
+            conversion.AddStream(videoStream);
+
+            // CalculatePadding(targetWidth, targetHeight, conversion, videoStream);
+
+            conversion.ChangeBitRateAndFormat(videoStream.Bitrate) //ToDo: add logic here
+                .AddAudioStream(mediaInfo);
+
+            _log.LogDebug("Start video resizing");
+
+            await conversion.Start();
+
+            _log.LogDebug("Video resizing finished");
         }
 
         public bool IsVideoFile(string filePath)
