@@ -30,6 +30,7 @@ namespace MemoARCenter.Services.Services
                  + Path.GetExtension(inputPath));
 
             // await FFMpegEdit(inputPath, outputPath);
+            outputPath = inputPath;
 
             _log.LogDebug("Start reading bytes");
 
