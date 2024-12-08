@@ -50,11 +50,17 @@ namespace MemoARCenter.Services.Services
             conversion.ChangeBitRateAndFormat(videoStream.Bitrate) //ToDo: add logic here
                 .AddAudioStream(mediaInfo);
 
+            _log.LogDebug("Start video resizing");
+
             await conversion.Start();
+
+            _log.LogDebug("Video resizing finished");
 
             var videoBytes = await File.ReadAllBytesAsync(outputPath);
 
             File.Delete(outputPath);
+
+            _log.LogDebug("Read file bytes and delete finished");
 
             return new VideoInfoDTO(videoBytes);
 
