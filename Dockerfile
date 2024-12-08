@@ -23,6 +23,9 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
+# Install required packages
+RUN apt-get update && apt-get install ffmpeg -y && apt-get install libx265-dev libnuma-dev -y
+	
 # Copy the published application
 COPY --from=publish /app/publish .
 
