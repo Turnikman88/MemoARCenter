@@ -63,9 +63,18 @@ public class FileUploadController : ControllerBase
 
         var fileUrl = $"{Request.Scheme}://{Request.Host}/api/fileupload/download/{guidFileName}";
 
+        _log.LogDebug($"File url is {fileUrl}");
+
+
         var base64Parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes(fileUrl));
 
+        _log.LogDebug($"base64Parameter is {base64Parameter}");
+        _log.LogDebug($"albumName is {albumName}");
+
         var qrCodeURL = $"{_host}/download-page/{base64Parameter}/{albumName}";
+
+        _log.LogDebug($"qrCodeURL url is {qrCodeURL}");
+
         var image = _qr.GenerateQrCode(qrCodeURL);
 
         return new ObjectResult(new { QRCode = image, QRCodeURL = qrCodeURL, Message = result.Message })

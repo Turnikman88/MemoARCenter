@@ -112,6 +112,13 @@ namespace MemoARCenter.Client.Pages
                 return;
             }
 
+            var url = $"{_host}/api/fileupload/upload?albumName={Helper.EncodeToBase64(AlbumName)}";
+
+
+            AlbumName = string.Empty;
+            StateHasChanged();
+            _loadingSpinner.Show();
+
             try
             {
                 using var zipStream = new MemoryStream();
@@ -169,14 +176,10 @@ namespace MemoARCenter.Client.Pages
 
 
                     // Send the POST request
-                    var url = $"{_host}/api/fileupload/upload?albumName={Helper.EncodeToBase64(AlbumName)}";
 
-
-                    AlbumName = string.Empty;
-                    _uploadedImages.Clear();
-                    StateHasChanged();
-                    _loadingSpinner.Show();
                     response = await httpClient.PostAsync(url, content);
+                    _uploadedImages.Clear();
+
 
                 }
                 catch (Exception ex)
