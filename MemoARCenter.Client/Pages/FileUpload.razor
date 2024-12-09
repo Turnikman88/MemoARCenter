@@ -36,6 +36,7 @@
 			@foreach (var image in _uploadedImages)
 			{
 				<div class="preview-item">
+					<button class="remove-image-button" @onclick="() => RemoveImage(image)" title="Remove Image">X</button>
 					<img src="@image.DataUrl" alt="@image.Name" class="preview-image" />
 					<div class="video-selection-container">
 						<button type="button" class="file-upload-button video-upload-button" @onclick="() => TriggerVideoInputClick(image.Name)">

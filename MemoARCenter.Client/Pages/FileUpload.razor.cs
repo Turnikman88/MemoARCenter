@@ -17,7 +17,7 @@ namespace MemoARCenter.Client.Pages
         private string _qrCodeImageData = string.Empty;
         private string _qrCodeURL = string.Empty;
         private bool _isIphone;
-        private bool _IsElementEnabled => (!string.IsNullOrEmpty(AlbumName) && _uploadedImages.Any(x => !string.IsNullOrEmpty(x.AssociatedVideoUrl)));
+        private bool _IsElementEnabled => (!string.IsNullOrEmpty(AlbumName) && _uploadedImages.All(x => !string.IsNullOrEmpty(x.AssociatedVideoUrl)));
         private bool _isImagesLoading;
         private string _host = string.Empty;
         private int _maxAllowedVideoSize;
@@ -33,20 +33,23 @@ namespace MemoARCenter.Client.Pages
         private async Task HandleImageSelected(InputFileChangeEventArgs e)
         {
             _qrCodeImageData = string.Empty;
+            _uploadStatus = string.Empty;
 
             _isImagesLoading = true;
-            _uploadedImages.Clear();
 
             var semaphore = new SemaphoreSlim(_isIphone ? 1 : 5); // Limit to 5 concurrent tasks or 1 for apple
 
             var tasks = e.GetMultipleFiles(25)
-                .Where(file => file != null && file.Size > 0 && file.ContentType.StartsWith("image"))
+                .Where(file => file != null 
+                            && file.Size > 0    
+                            && file.ContentType.StartsWith("image") 
+                            && !_uploadedImages.Any(x => x.Name == file.Name))
                 .Select(async file =>
                 {
                     await semaphore.WaitAsync();
 
                     try
-                    {
+                    {                        
                         using var stream = file.OpenReadStream(maxAllowedSize: _maxAllowedImageSize);
                         using var memoryStream = new MemoryStream();
                         await stream.CopyToAsync(memoryStream);
@@ -69,13 +72,13 @@ namespace MemoARCenter.Client.Pages
                     finally
                     {
                         semaphore.Release();
-                        _isImagesLoading = false;
                     }
                 });
 
             var previews = await Task.WhenAll(tasks);
 
             _uploadedImages.AddRange(previews);
+            _isImagesLoading = false;
         }
 
         private async Task HandleVideoSelected(InputFileChangeEventArgs e, FilePreviewModel image)
@@ -247,6 +250,12 @@ namespace MemoARCenter.Client.Pages
             var inputId = $"video-input-{imageName}";
             await JSRuntime.InvokeVoidAsync("triggerInputClick", inputId);
         }
+
+        private void RemoveImage(FilePreviewModel image)
+        {
+            _uploadedImages.Remove(image);
+        }
+
 
         private void SetConfig()
         {

@@ -30,6 +30,8 @@ namespace MemoARCenter.Components.Pages
 
         private void HandleFileChange(InputFileChangeEventArgs e)
         {
+            _qrCodeImageData = string.Empty;
+
             _log.LogDebug("Zip file was changed");
 
             _selectedFile = e.File;

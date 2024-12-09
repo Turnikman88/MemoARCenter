@@ -50,24 +50,24 @@ body {
     border: 2px solid transparent;
 }
 
-    .file-upload-button:hover,
-    .video-upload-button:hover,
-    .upload-button:hover {
-        background-color: #D2042D;
-        transform: translateY(-2px);
-    }
+.file-upload-button:hover,
+.video-upload-button:hover,
+.upload-button:hover {
+    background-color: #D2042D;
+    transform: translateY(-2px);
+}
 
-    .file-upload-button:active,
-    .video-upload-button:active,
-    .upload-button:active {
-        transform: scale(0.98);
-    }
+.file-upload-button:active,
+.video-upload-button:active,
+.upload-button:active {
+    transform: scale(0.98);
+}
 
-    .file-upload-button:disabled,
-    .upload-button:disabled {
-        background-color: #d15278;
-        cursor: not-allowed;
-    }
+.file-upload-button:disabled,
+.upload-button:disabled {
+    background-color: #d15278;
+    cursor: not-allowed;
+}
 
 .button-area {
     margin-top: 20px;
@@ -111,9 +111,9 @@ body {
     transition: color 0.3s ease;
 }
 
-    .about-link:hover {
-        color: #EFECE9;
-    }
+.about-link:hover {
+    color: #EFECE9;
+}
 
 .content {
     padding: 20px;
@@ -136,10 +136,10 @@ body {
     margin-bottom: 20px;
 }
 
-    .welcome-title .app-name {
-        color: #D70040;
-        font-weight: bold;
-    }
+.welcome-title .app-name {
+    color: #D70040;
+    font-weight: bold;
+}
 
 .app-description {
     background-color: #1a1a1a;
@@ -168,6 +168,7 @@ body {
 }
 
 .preview-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -341,7 +342,34 @@ body {
     transition: border-color 0.3s ease;
 }
 
-    .album-name-input:focus {
-        border-color: #D70040;
-        box-shadow: 0 0 5px rgba(215, 0, 64, 0.5);
-    }
+.album-name-input:focus {
+    border-color: #D70040;
+    box-shadow: 0 0 5px rgba(215, 0, 64, 0.5);
+}
+
+.remove-image-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #D70040;
+    color: #EFECE9;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    z-index: 10; 
+}
+
+.remove-image-button:hover {
+    background-color: #D2042D;
+    transform: scale(1.1);
+}
+
+.remove-image-button:active {
+    transform: scale(0.95);
+}
