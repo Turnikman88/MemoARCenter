@@ -32,6 +32,8 @@ namespace MemoARCenter.Client.Pages
         }
         private async Task HandleImageSelected(InputFileChangeEventArgs e)
         {
+            _qrCodeImageData = string.Empty;
+
             _isImagesLoading = true;
             _uploadedImages.Clear();
 
