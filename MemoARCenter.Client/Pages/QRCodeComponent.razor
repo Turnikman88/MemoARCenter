@@ -1,0 +1,14 @@
+﻿@inject IJSRuntime JSRuntime;
+
+@if (!string.IsNullOrEmpty(QRCodeImageData))
+{
+	<div class="qr-code-area">
+		<h4 class="preview-header">Your QR Code:</h4>
+		<a href="@QRCodeURL" target="_blank">
+			<img src="@QRCodeImageData" alt="QR Code" class="qr-code" />
+		</a>
+	</div>
+
+	<br />
+	<button @onclick="SaveCode" disabled="@(!_isJsInitialized)" class="upload-button">Save Code</button>
+}

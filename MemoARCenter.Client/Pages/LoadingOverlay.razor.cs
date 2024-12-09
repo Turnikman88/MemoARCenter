@@ -8,7 +8,7 @@ namespace MemoARCenter.Client.Pages
         public bool IsVisible { get; set; }
 
         [Parameter]
-        public string? LoadingMessage { get; set; }
+        public string LoadingMessage { get; set; }
 
         public void Show(string? message = null)
         {

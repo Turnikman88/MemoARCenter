@@ -26,14 +26,7 @@
 
     <SmallLoadingSpinner @ref="_loadingSpinner" />
 
-    @if (!string.IsNullOrEmpty(_qrCodeImageData))
-    {
-        <div class="qr-code-area">
-            <h4 class="preview-header">Your QR Code:</h4>
-            <a href="@_qrCodeURL" target="_blank">
-                <img src="@_qrCodeImageData" alt="QR Code" class="qr-code" />
-            </a>
-        </div>
-    }
+    <QRCodeComponent QRCodeURL="@_qrCodeURL" QRCodeImageData="@_qrCodeImageData" />
+
 </div>
 

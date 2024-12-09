@@ -29,5 +29,17 @@ return new Uint8Array(await blob.arrayBuffer());
 isIphone: () => {
 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 return /iPhone|iPad|iPod|Mac/i.test(userAgent);
-}
+    },
+
+saveQrCodeImage: (base64Image, fileName) => {
+        const link = document.createElement('a');
+        link.href = base64Image;
+        link.download = fileName;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+    }
 };
