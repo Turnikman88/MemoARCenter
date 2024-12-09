@@ -39,12 +39,17 @@ namespace MemoARCenter.Helpers
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
-
-            var bytes = Encoding.UTF8.GetBytes(input);
+            
+            var bytes = Encoding.UTF8.GetBytes(input.ReplaceURLProblematicChars());
 
             var base64 = Convert.ToBase64String(bytes);
 
             return base64;
+        }
+
+        public static string ReplaceURLProblematicChars(this string input)
+        {
+            return input.Replace("+", "-").Replace("/", "_").Replace(Environment.NewLine, string.Empty).Trim();
         }
     }
 }
