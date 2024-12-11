@@ -408,26 +408,19 @@ body {
     vertical-align: middle;
 }
 
-.navbar-brand:focus,
-.navbar-brand:hover,
-.navbar-brand:active,
-.navbar-brand.active{
-    color: #D70040;
-}
-
 .nav-link {
-    color: #AC9C8D;
+    color: #AC9C8D; 
     font-weight: bold;
-    font-size: 0.9rem;
-    padding: 5px 10px;
+    font-size: 0.9rem;  
+    padding: 5px 10px;  
     transition: color 0.3s ease, background-color 0.3s ease;
-    border-radius: 5px;
+    border-radius: 5px;  
 }
 
-.nav-link:hover {
-    color: #EFECE9;  
-    background-color: rgba(215, 0, 64, 0.2);  
-}
+    .nav-link:hover {
+        color: #EFECE9;  
+        background-color: rgba(215, 0, 64, 0.2);  
+    }
 
 .contact-link {
     color: #D70040;  
@@ -459,8 +452,8 @@ body {
 .nav-link:focus,
 .nav-link:active,
 .nav-link.active {
-    color: #D70040;
-    background-color: rgba(215, 0, 64, 0.2);
+    color: #D70040;  
+    background-color: rgba(215, 0, 64, 0.2);  
     font-weight: bold;
-    text-decoration: none;
+    text-decoration: none;  
 }
