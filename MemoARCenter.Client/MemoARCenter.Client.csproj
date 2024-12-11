@@ -17,4 +17,8 @@
     <ProjectReference Include="..\MemoARCenter.Services\MemoARCenter.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\src\" />
+  </ItemGroup>
+
 </Project>

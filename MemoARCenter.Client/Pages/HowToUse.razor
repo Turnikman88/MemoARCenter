@@ -1,0 +1,86 @@
+﻿@page "/how-to-use"
+@page "/howto"
+@using Microsoft.AspNetCore.Components
+
+<div class="content">
+    <div class="home-container">
+        <h1 class="welcome-title">How to Use <span class="app-name" style="color: #D70040;">MemoAR</span></h1>
+    </div>
+
+    <div class="app-description">
+        <div class="preview-area">
+            <!-- Step 1 -->
+            <div class="preview-item">
+                <h3 class="preview-header">Step 1: Scan the QR Code</h3>
+                <div class="qr-code-area">
+                    <img src="/src/demo-qrCode.png" alt="QR Code" class="qr-code">
+                </div>
+                <p>Open your phone’s camera app or a QR code scanner app.</p>
+                <p>Point it at the QR code provided.</p>
+                <p>Tap the link that pops up to open the <span style="color: #D70040;">MemoAR</span> app.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="preview-item">
+                <h3 class="preview-header">Step 2: Wait for the Database to Load</h3>
+                <p>The app will display a loading screen as it downloads the necessary images and videos.</p>
+                <p><strong>Ensure you have an internet connection for this step.</strong></p>
+                <p>Once loaded, you’re ready to scan!</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="preview-item">
+                <h3 class="preview-header">Step 3: Point and Scan the Target Photo</h3>
+                <img src="/src/demo-target.jpg" alt="Target Photo Example" class="preview-image">
+                <p>Hold your phone steady and point the camera at the target photo.</p>
+                <p>If the app recognizes the image, it will map the linked video to the photo.</p>
+                <p><strong>Enjoy the video playback on your screen!</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Features Section -->
+    <div class="app-description">
+        <h2 class="header">Additional Features</h2>
+
+        <div class="preview-area">
+            <div class="preview-item">
+                <h3 class="preview-header">Uploading Your Own Photos and Videos</h3>
+                <p>Ready to upload your own photos and videos? </p>
+
+                <p> Go to the <a href="/file-upload" style="color: #D70040; text-decoration: underline;">Upload Page</a> to get started!</p>
+
+                <p>Enter an album name (required).</p>
+                <p>Click <span style="color: #D70040;">"Select Images"</span> to upload your photos (required).</p>
+                <p>Assign a video to each image to activate the <span style="color: #D70040;">"Upload"</span> button.</p>
+                <p>Click "Upload" and wait for the loading animation to complete.</p>
+                <p>A photo of the QR code will appear after uploading finishes. Click the QR code to simulate scanning.</p>
+                <p>You can download the QR code and share it with friends and family. Simply click on the "Save Code" button</p>
+
+            </div>
+
+            <div class="preview-item">
+                <h3 class="preview-header">Troubleshooting</h3>
+                <h4 style="color: #EFECE9;">QR Code Won’t Scan</h4>
+                <p>Ensure the QR code is clear and well-lit. Clean your phone’s camera lens.</p>
+                <h4 style="color: #EFECE9;">App Doesn’t Recognize the Photo</h4>
+                <p>Make sure you’re scanning a photo linked in the database and your internet connection is active.</p>
+                <h4 style="color: #EFECE9;">Video Doesn’t Play</h4>
+                <p>Restart the app and try again.</p>
+                <h4 style="color: #EFECE9;">Supported Formats</h4>
+                <ul>
+                    <li>Photos: .jpg, .jpeg, .png (up to 10MB per image)</li>
+                    <li>Videos: .mp4, .mov (up to 5 seconds, up to 80MB per video)</li>
+                </ul>
+                <p><strong>Note:</strong> Total upload size must not exceed 100MB.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer Section -->
+    <div class="app-description">
+        <h2 class="header" style="color: #EFECE9;">Disclaimer</h2>
+        <p>MemoAR is currently in beta. Some features may not work perfectly. We value your feedback as we improve.</p>
+        <p>Thank you for choosing <span style="color: #D70040;">MemoAR</span>! For questions, send email to v.georgi1820@gmail.com.</p>
+    </div>
+</div>
