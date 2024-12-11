@@ -2,47 +2,55 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content horizontally */
-    justify-content: center; /* Center content vertically */
-    gap: 15px; /* Increased gap for better spacing */
-    border: 1px solid #AC9C8D; /* Adjusted border color for consistency */
-    padding: 20px; /* Consistent padding */
-    border-radius: 10px; /* Slightly more rounded corners */
-    background-color: #1a1a1a; /* Dark background for contrast */
-    color: #EFECE9; /* Light text color for readability */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border: 1px solid #AC9C8D;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #1a1a1a;
+    color: #EFECE9;
     width: 100%;
-    max-width: 350px; /* Slightly increased max width for larger content */
+    max-width: 350px;
     box-sizing: border-box;
-    text-align: center; /* Center-align text */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for depth */
-    transition: transform 0.3s ease; /* Smooth hover effect */
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
 }
 
     .preview-item:hover {
-        transform: scale(1.02); /* Slight scaling on hover */
-        border-color: #D70040; /* Highlight border on hover */
+        transform: scale(1.02);
+        border-color: #D70040;
     }
 
 .preview-header {
-    font-size: 20px; /* Slightly larger font size */
-    font-weight: bold; /* Emphasized header */
-    color: #D70040; /* Red color for headers */
+    font-size: 20px;
+    font-weight: bold;
+    color: #D70040;
     text-align: center;
-    margin-bottom: 15px; /* Increased spacing below header */
+    margin-bottom: 15px;
 }
 
 .preview-item p {
-    margin: 10px 0; /* More space between paragraphs */
-    line-height: 1.6; /* Improved readability */
-    text-align: center; /* Ensure all text is center-aligned */
-    font-size: 16px; /* Slightly larger font size for better visibility */
+    margin: 10px 0;
+    line-height: 1.6;
+    text-align: center;
+    font-size: 16px;
 }
 
 .preview-item img {
-    border: 2px solid #AC9C8D; /* Styled border for images */
-    border-radius: 8px; /* Rounded corners for images */
+    border: 2px solid #AC9C8D;
+    border-radius: 8px;
     max-width: 100%;
     height: auto;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for images */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     margin-bottom: 10px;
+}
+
+.app-description h2 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.8rem;
+    color: #EFECE9;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }

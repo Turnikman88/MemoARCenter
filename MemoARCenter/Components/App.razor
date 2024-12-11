@@ -13,6 +13,33 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="src/favicon.png" alt="MemoAR Logo" class="navbar-logo"> MemoAR
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/how-to-use">How to Use</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/file-upload">File Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload-zip">Upload ZIP</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="background-circles">
         <!-- Top Left -->
         <div class="circle" style="width: 150px; height: 150px; top: 5%; left: 5%;"></div>
@@ -26,6 +53,7 @@
     </div>
 
     <Routes />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="site.js"></script>
     <script src="_framework/blazor.web.js"></script>
